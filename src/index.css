@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Animación personalizada para el título */
+@keyframes pulseGlow {
+  0% {
+    text-shadow: 0 0 0px #ffd700;
+  }
+  50% {
+    text-shadow: 0 0 12px #ffd700, 0 0 24px #ffd700;
+  }
+  100% {
+    text-shadow: 0 0 0px #ffd700;
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 2s infinite;
+}
+/* Glow dorado suave */
+.glow-gold {
+  color: #ffd700;
+  text-shadow:
+    0 0 3px #ffd700,
+    0 0 6px #ffcc00,
+    0 0 9px #ff9900,
+    0 0 12px #ffcc00;
+  animation: glowFlicker 1.8s infinite alternate;
+}
+
+@keyframes glowFlicker {
+  0% {
+    opacity: 0.85;
+    text-shadow:
+      0 0 3px #ffcc00,
+      0 0 6px #ff9900,
+      0 0 9px #ffcc00;
+  }
+  100% {
+    opacity: 1;
+    text-shadow:
+      0 0 5px #ffd700,
+      0 0 10px #ffaa00,
+      0 0 15px #ff9900;
+  }
+}
