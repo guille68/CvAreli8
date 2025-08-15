@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, forwardRef, ReactNode } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef, forwardRef, ReactNode } from 'react';
 import {
   User, Briefcase, GraduationCap, Globe, Zap, Brain, Landmark, FileText, HardHat, Users,
   BarChart, Gem, Lightbulb, Info, Settings, Bot, Handshake, BookOpen, Flag, LayoutDashboard,
@@ -302,7 +302,7 @@ const Navigation = ({
   ];
 
   return (
-    <nav className="fixed lg:left-0 top-0 w-full lg:w-80 h-16 lg:h-screen bg-[#1e2a38] text-gray-200 shadow-2xl z-50">
+    <nav className="app-nav fixed lg:left-0 top-0 w-full lg:w-80 h-16 lg:h-screen bg-[#1e2a38] text-gray-200 shadow-2xl z-50">
       <div className="container mx-auto px-4 lg:px-0 h-full flex items-center justify-between lg:block">
         <div className="lg:py-8 flex items-center lg:justify-center">
           <div className="flex-shrink-0 flex items-center lg:flex-col lg:text-center">
@@ -609,9 +609,7 @@ const ContactCard = ({
           <div>
             <p className="text-sm font-semibold text-gray-500 dark:text-gray-300">{label}</p>
             <p className="text-lg font-bold text-[#4a688b] dark:text-slate-100 break-words">{value}</p>
-            {isLink && (
-              <p className="text-sm text-blue-600 dark:text-blue-300 mt-1 break-all underline">{href}</p>
-            )}
+            {/* Eliminado: impresión redundante del href para evitar duplicados en PDF/HTML */}
           </div>
         </div>
         {isLink && (
@@ -647,6 +645,18 @@ const App = () => {
     }
   };
   const [isDark, setIsDark] = useState<boolean>(getInitialDark());
+
+  // Patch A: aplicar 'dark' antes del primer pintado
+  useLayoutEffect(() => {
+    const saved = (() => {
+      try { return localStorage.getItem('theme'); } catch { return null; }
+    })();
+    const initialDark =
+      saved ? saved === 'dark'
+            : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    document.documentElement.classList.toggle('dark', initialDark);
+  }, []);
+
   useEffect(() => {
     document.documentElement.classList.toggle('dark', isDark);
     try {
@@ -674,13 +684,25 @@ const App = () => {
     return () => observer.disconnect();
   }, []);
 
-  // PDF: expande colapsables, captura TODO (nav+carousel+main), y restaura
+  // PDF: expande colapsables, ajusta nav y restaura; multipágina
   const handleDownloadPDF = async () => {
     const root = wrapperRef.current;
     if (!root) return;
 
     window.scrollTo(0, 0);
 
+    // --- Patch B: extender lateral azul durante la captura ---
+    const navEl = root.querySelector('.app-nav') as HTMLElement | null;
+    const prevNav = navEl
+      ? { position: navEl.style.position, height: navEl.style.height, top: navEl.style.top }
+      : null;
+    if (navEl) {
+      navEl.style.position = 'absolute';
+      navEl.style.top = '0';
+      navEl.style.height = `${root.scrollHeight}px`;
+    }
+
+    // Expande colapsables
     const collapsibles = Array.from(
       root.querySelectorAll<HTMLElement>('[data-collapsible-content="true"]')
     );
@@ -717,22 +739,30 @@ const App = () => {
 
     while (heightLeft > 0) {
       pdf.addPage();
-      y -= pageHeight; // desplazar la imagen hacia arriba por cada página nueva
+      y -= pageHeight; // desplazar la imagen hacia arriba por cada página
       pdf.addImage(imgData, 'PNG', 0, y, imgWidth, imgHeight);
       heightLeft -= pageHeight;
     }
 
     pdf.save('CV_Areli_Aguilar.pdf');
 
+    // Restaurar colapsables
     collapsibles.forEach((el, i) => {
       el.style.maxHeight = prevHeights[i];
     });
+
+    // Restaurar nav
+    if (navEl && prevNav) {
+      navEl.style.position = prevNav.position;
+      navEl.style.height = prevNav.height;
+      navEl.style.top = prevNav.top;
+    }
   };
 
   return (
     <div
       ref={wrapperRef}
-      id="cv-container" // === AÑADIDO: compatibilidad con capturas y herramientas externas
+      id="cv-container"
       className="min-h-screen bg-gray-50 dark:bg-[#0b1220] font-sans antialiased text-gray-800 dark:text-gray-100"
     >
       <style>{`
@@ -763,12 +793,12 @@ const App = () => {
         border-color:#475569;          /* slate-600 */
       }
 
-      /* === AÑADIDO: Compat .competencia-btn para mayor contraste en oscuro === */
-      .competencia-btn { /* en claro hereda de .skill-chip */ }
+      /* Compatibilidad: mayor contraste en oscuro para chips marcados como competencia-btn */
+      .competencia-btn { }
       .dark .competencia-btn { color: #fff !important; background-color: rgba(255,255,255,0.08); }
       .dark .competencia-btn:hover { background-color: rgba(255,255,255,0.16); }
 
-      /* === AÑADIDO: Tooltip en modo oscuro (sin tocar estilos en claro) === */
+      /* Tooltip en modo oscuro */
       .dark .tooltip-content {
         background-color: #0f172a;    /* slate-900 */
         color: #e5e7eb;               /* gray-200 */
