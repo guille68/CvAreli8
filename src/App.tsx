@@ -224,14 +224,12 @@ const MarqueeCarousel = () => {
       onMouseLeave={() => setIsHovering(false)}
     >
       <div className={`marquee-container ${isHovering ? 'paused' : ''}`}>
-        {/* Grupo 1 */}
         {phrases.map((item, index) => (
           <div key={`g1-${index}`} className="marquee-item">
             <span className="icon">{item.icon}</span>
             <span>{item.text}</span>
           </div>
         ))}
-        {/* Grupo 2 (idéntico) */}
         {phrases.map((item, index) => (
           <div key={`g2-${index}`} className="marquee-item">
             <span className="icon">{item.icon}</span>
@@ -337,7 +335,7 @@ const Navigation = ({
                   {isDark ? <Sun size={18} /> : <Moon size={18} />}
                 </button>
 
-                {/* Botón discreto con texto */}
+                {/* Botón con texto: Descargar CV */}
                 <button
                   onClick={onDownloadPDF}
                   className="px-3 h-9 rounded-full border border-white/30 flex items-center gap-2 hover:bg-white/10 transition text-gray-100"
@@ -450,7 +448,7 @@ const CollapsibleExperience = ({
   }, [isOpen]);
 
   return (
-    <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden mb-4 border border-gray-200 dark:border-slate-700">
+    <div className="cv-break bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden mb-4 border border-gray-200 dark:border-slate-700">
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex justify-between items-center p-4 sm:p-6 text-left transition-colors duration-200 hover:bg-gray-50 dark:hover:bg-slate-700/40 focus:outline-none"
@@ -487,7 +485,7 @@ const CollapsibleExperience = ({
         <div className="px-6 pb-6 pt-2 border-t border-gray-200 dark:border-slate-700">
           <ul className="list-none space-y-2">
             {description.map((item, index) => (
-              <li key={index} className="flex items-start text-gray-700 dark:text-gray-200">
+              <li key={index} className="cv-break flex items-start text-gray-700 dark:text-gray-200">
                 <span className="text-amber-600 mr-2 flex-shrink-0">&rarr;</span>
                 <span>{item}</span>
               </li>
@@ -522,7 +520,7 @@ const EducationCard = ({
   period: string;
   description: string | string[];
 }) => (
-  <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 mb-4 border border-gray-200 dark:border-slate-700">
+  <div className="cv-break bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 mb-4 border border-gray-200 dark:border-slate-700">
     <div className="flex items-start">
       <div className="mr-4 flex-shrink-0" style={{ color: iconColor }}>
         {icon}
@@ -533,7 +531,7 @@ const EducationCard = ({
         {Array.isArray(description) ? (
           <ul className="list-none space-y-2">
             {description.map((item, index) => (
-              <li key={index} className="flex items-start text-gray-700 dark:text-gray-200">
+              <li key={index} className="cv-break flex items-start text-gray-700 dark:text-gray-200">
                 <span className="text-amber-600 mr-2 flex-shrink-0">&rarr;</span>
                 <span>{item}</span>
               </li>
@@ -548,11 +546,11 @@ const EducationCard = ({
 );
 
 const OtherStudies = ({ items }: { items: string[] }) => (
-  <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 mb-4 border border-gray-200 dark:border-slate-700">
+  <div className="cv-break bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 mb-4 border border-gray-200 dark:border-slate-700">
     <h3 className="text-lg font-bold text-[#4a688b] dark:text-slate-100 mb-2">Otros estudios:</h3>
     <ul className="list-none space-y-2">
       {items.map((item, index) => (
-        <li key={index} className="flex items-start text-gray-700 dark:text-gray-200">
+        <li key={index} className="cv-break flex items-start text-gray-700 dark:text-gray-200">
           <BookOpen className="mr-2 flex-shrink-0 text-amber-600" size={20} />
           <span>{item}</span>
         </li>
@@ -562,7 +560,7 @@ const OtherStudies = ({ items }: { items: string[] }) => (
 );
 
 const LanguageCard = ({ language, proficiency }: { language: string; proficiency: string }) => (
-  <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 border border-gray-200 dark:border-slate-700 flex-1 min-w-[150px] transition-all duration-300 hover:shadow-lg">
+  <div className="cv-break bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 border border-gray-200 dark:border-slate-700 flex-1 min-w-[150px] transition-all duration-300 hover:shadow-lg">
     <div className="flex items-center">
       <Flag className="w-6 h-6 mr-4 flex-shrink-0 text-amber-600" />
       <div>
@@ -609,7 +607,7 @@ const ContactCard = ({
   const isLink = !!href;
   const inner = (
     <div
-      className={`bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 mb-4 border border-gray-200 dark:border-slate-700 transition-all duration-300 ${
+      className={`cv-break bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 mb-4 border border-gray-200 dark:border-slate-700 transition-all duration-300 ${
         isLink ? 'bg-gray-100/60 dark:bg-slate-700/40' : ''
       }`}
     >
@@ -693,15 +691,15 @@ const App = () => {
     return () => observer.disconnect();
   }, []);
 
-  // PDF: expandir colapsables, estirar lateral azul, y cortar en límites de sección
+  // PDF: expandir colapsables, estirar lateral azul (buffer) y cortar en límites de sección/cards
   const handleDownloadPDF = async () => {
     const root = wrapperRef.current;
     if (!root) return;
 
-    // 1) Activar modo captura (index.css ajusta .app-nav)
+    // 1) Activar modo captura
     document.body.classList.add('capture-pdf');
 
-    // Estirar lateral azul hasta el final
+    // 2) Estirar lateral azul mucho más que el documento
     const navEl = root.querySelector('.app-nav') as HTMLElement | null;
     const prevNav = navEl
       ? {
@@ -713,17 +711,16 @@ const App = () => {
         }
       : null;
 
-    const totalHeight = Math.max(
+    const docH = Math.max(
       document.documentElement.scrollHeight,
-      document.documentElement.offsetHeight,
       document.body ? document.body.scrollHeight : 0,
-      document.body ? document.body.offsetHeight : 0,
-      root.scrollHeight,
-      root.offsetHeight
+      root.scrollHeight
     );
-    if (navEl) navEl.style.height = `${totalHeight}px`;
+    if (navEl) {
+      navEl.style.height = `${docH + 5000}px`; // buffer generoso ⇒ siempre llega a Contacto
+    }
 
-    // 2) Ir al tope y expandir colapsables
+    // 3) Ir al tope y expandir colapsables
     window.scrollTo(0, 0);
     const collapsibles = Array.from(
       root.querySelectorAll<HTMLElement>('[data-collapsible-content="true"]')
@@ -733,7 +730,7 @@ const App = () => {
 
     await new Promise((r) => setTimeout(r, 250));
 
-    // 3) Captura
+    // 4) Captura
     const bg = getComputedStyle(root).backgroundColor || (isDark ? '#0b1220' : '#ffffff');
     const canvas = await html2canvas(root, {
       scale: 2,
@@ -746,7 +743,7 @@ const App = () => {
       scrollY: -window.scrollY,
     });
 
-    // 4) PDF
+    // 5) PDF y conversiones
     const imgData = canvas.toDataURL('image/png');
     const pdf = new jsPDF('p', 'pt', 'a4');
     const pageWidth = pdf.internal.pageSize.getWidth();
@@ -754,32 +751,39 @@ const App = () => {
     const imgWidth = pageWidth;
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-    // Conversión DOMpx <-> PDFpt
-    const pxToPdf = imgWidth / canvas.width;
-    const pdfToPx = 1 / pxToPdf;
+    const pxToPdf = imgWidth / canvas.width;   // pt por px DOM
+    const pdfToPx = 1 / pxToPdf;               // px DOM por pt
     const domPageHeight = pageHeight * pdfToPx;
 
-    // 5) Cortes seguros: inicios de cada .cv-section
+    // 6) Puntos de corte seguros: .cv-section y .cv-break
     const rootRect = root.getBoundingClientRect();
-    const sections = Array.from(root.querySelectorAll<HTMLElement>('.cv-section'));
-    const safeTops = [0, ...sections.map(s =>
-      (s.getBoundingClientRect().top - rootRect.top + window.scrollY)
-    )].sort((a,b) => a - b);
+    const safeNodes = Array.from(root.querySelectorAll<HTMLElement>('.cv-section, .cv-break'));
+    const safeTopsSet = new Set<number>();
+    safeTopsSet.add(0);
+    safeNodes.forEach((n) => {
+      const rect = n.getBoundingClientRect();
+      const topAbs = rect.top - rootRect.top + window.scrollY;
+      safeTopsSet.add(Math.max(0, Math.round(topAbs))); // normaliza para evitar subpíxeles
+    });
+    safeTopsSet.add(canvas.height);
+    const safeTops = Array.from(safeTopsSet).sort((a, b) => a - b);
 
+    // 7) Construcción de páginas usando los cortes seguros
     const pageStartsPx: number[] = [];
     let currentStart = 0;
-    const margin = 24; // amortiguador
+    const margin = 24;       // holgura
+    const minAdvance = 120;  // avanzar al menos 120px entre páginas
 
     while (currentStart < canvas.height - 1) {
       const limit = currentStart + domPageHeight - margin;
-      const candidates = safeTops.filter(v => v > currentStart + margin && v <= limit);
+      const candidates = safeTops.filter(v => v > currentStart + minAdvance && v <= limit);
       const nextStart = candidates.length ? candidates[candidates.length - 1] : Math.min(limit, canvas.height);
       pageStartsPx.push(currentStart);
       if (nextStart <= currentStart + 1) break;
       currentStart = nextStart;
     }
 
-    // 6) Añadir páginas respetando los cortes
+    // 8) Añadir páginas respetando cortes
     pageStartsPx.forEach((startPx, idx) => {
       if (idx > 0) pdf.addPage();
       const yPdf = -startPx * pxToPdf;
@@ -788,7 +792,7 @@ const App = () => {
 
     pdf.save('CV_Areli_Aguilar.pdf');
 
-    // 7) Restaurar
+    // 9) Restaurar
     collapsibles.forEach((el, i) => { el.style.maxHeight = prevHeights[i]; });
     if (navEl && prevNav) {
       navEl.style.position = prevNav.position;
@@ -820,7 +824,7 @@ const App = () => {
         display: flex;
         height: 100%;
         width: max-content;
-        animation: marquee 23s linear infinite; /* acelera reduciendo este valor, ej. 48s */
+        animation: marquee 60s linear infinite; /* más rápido ⇒ reduce este valor, p.ej. 48s */
         will-change: transform;
       }
       .marquee-container.paused { animation-play-state: paused; }
@@ -845,7 +849,7 @@ const App = () => {
       .skill-chip{ background-color:#e5e7eb; color:#374151; border:1px solid #d1d5db; }
       .dark .skill-chip{ background-color:#334155; color:#f8fafc; border-color:#475569; }
 
-      /* Compatibilidad: mayor contraste en oscuro para chips marcados como competencia-btn */
+      /* Contraste extra en oscuro para chips marcardos como competencia-btn */
       .competencia-btn { }
       .dark .competencia-btn { color: #fff !important; background-color: rgba(255,255,255,0.08); }
       .dark .competencia-btn:hover { background-color: rgba(255,255,255,0.16); }
