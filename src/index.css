@@ -18,6 +18,7 @@
 .animate-pulse-glow {
   animation: pulseGlow 2s infinite;
 }
+
 /* Glow dorado suave */
 .glow-gold {
   color: #ffd700;
@@ -44,4 +45,29 @@
       0 0 10px #ffaa00,
       0 0 15px #ff9900;
   }
+}
+
+/* ---------- Ajustes adicionales ---------- */
+
+/* 1) Modo oscuro: mejora formularios/scrollbar y componentes nativos */
+html.dark {
+  color-scheme: dark;
+}
+
+/* 2) Competencias: contraste en modo oscuro (usado por .competencia-btn en App.tsx) */
+.dark .competencia-btn {
+  color: #fff !important;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+.dark .competencia-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* 3) Captura PDF: estirar el lateral azul (nav .app-nav) solo durante la captura */
+.capture-pdf .app-nav {
+  position: absolute !important;
+  top: 0;
+  left: 0;
+  height: 100% !important;
+  min-height: 100% !important;
 }
