@@ -772,7 +772,7 @@ const App = () => {
 
       /* Carrusel continuo sin huecos */
       @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-      .marquee-container { display:flex; height:100%; width:max-content; animation:marquee 60s linear infinite; will-change:transform; }
+      .marquee-container { display:flex; height:100%; width:max-content; animation:marquee 30s linear infinite; will-change:transform; }
       .marquee-container.paused { animation-play-state: paused; }
       .marquee-item { flex-shrink:0; display:flex; align-items:center; white-space:nowrap; padding:0 1.75rem; font-family:'Inter', sans-serif; font-size:1.1rem; font-weight:400; color:#4a688b; }
       @media (max-width:1023px){ .marquee-item{ font-size:.95rem; padding:0 1rem; } }
