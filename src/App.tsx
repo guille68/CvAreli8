@@ -609,7 +609,7 @@ const ContactCard = ({
           <div>
             <p className="text-sm font-semibold text-gray-500 dark:text-gray-300">{label}</p>
             <p className="text-lg font-bold text-[#4a688b] dark:text-slate-100 break-words">{value}</p>
-            {/* Eliminado el href visible para evitar duplicados */}
+            {/* evitamos imprimir el href para que no se duplique texto */}
           </div>
         </div>
         {isLink && (
@@ -684,14 +684,15 @@ const App = () => {
     return () => observer.disconnect();
   }, []);
 
-  // PDF: expande colapsables, pinta lateral azul completo, multipágina y restaura
+  // PDF: expande colapsables, estira lateral azul (captura) y restaura
   const handleDownloadPDF = async () => {
     const root = wrapperRef.current;
     if (!root) return;
 
-    window.scrollTo(0, 0);
+    // Modo captura activado (index.css ajusta .app-nav)
+    document.body.classList.add('capture-pdf');
 
-    // --- Patch B2: extender lateral azul durante la captura (altura total robusta) ---
+    // Backup y estirado extra del nav (robusto para html2canvas)
     const navEl = root.querySelector('.app-nav') as HTMLElement | null;
     const prevNav = navEl
       ? {
@@ -711,39 +712,25 @@ const App = () => {
       root.scrollHeight,
       root.offsetHeight
     );
-
-    let navOverlay: HTMLDivElement | null = null;
-
     if (navEl) {
-      navEl.style.position = 'absolute';
-      navEl.style.top = '0';
-      navEl.style.left = '0';
+      // aunque .capture-pdf lo pone en absolute, forzamos la altura real por seguridad
       navEl.style.height = `${totalHeight}px`;
-      navEl.style.zIndex = '50';
-
-      navOverlay = document.createElement('div');
-      const navRect = navEl.getBoundingClientRect();
-      navOverlay.style.position = 'absolute';
-      navOverlay.style.top = '0';
-      navOverlay.style.left = '0';
-      navOverlay.style.width = `${navRect.width || navEl.offsetWidth || 320}px`; // ~ w-80
-      navOverlay.style.height = `${totalHeight}px`;
-      navOverlay.style.backgroundColor = '#1e2a38';
-      navOverlay.style.zIndex = '49';
-      root.insertBefore(navOverlay, root.firstChild);
     }
 
-    // Expande colapsables
+    // Ir al tope
+    window.scrollTo(0, 0);
+
+    // Expandir colapsables
     const collapsibles = Array.from(
       root.querySelectorAll<HTMLElement>('[data-collapsible-content="true"]')
     );
     const prevHeights = collapsibles.map((el) => el.style.maxHeight);
-    collapsibles.forEach((el) => {
-      el.style.maxHeight = `${el.scrollHeight}px`;
-    });
+    collapsibles.forEach((el) => { el.style.maxHeight = `${el.scrollHeight}px`; });
 
+    // Dejar que el layout se asiente
     await new Promise((r) => setTimeout(r, 250));
 
+    // Captura
     const bg = getComputedStyle(root).backgroundColor || (isDark ? '#0b1220' : '#ffffff');
     const canvas = await html2canvas(root, {
       scale: 2,
@@ -752,8 +739,11 @@ const App = () => {
       backgroundColor: bg,
       windowWidth: document.documentElement.scrollWidth,
       windowHeight: document.documentElement.scrollHeight,
+      scrollX: 0,
+      scrollY: -window.scrollY,
     });
 
+    // PDF multipágina
     const imgData = canvas.toDataURL('image/png');
     const pdf = new jsPDF('p', 'pt', 'a4');
     const pageWidth = pdf.internal.pageSize.getWidth();
@@ -778,15 +768,9 @@ const App = () => {
     pdf.save('CV_Areli_Aguilar.pdf');
 
     // Restaurar colapsables
-    collapsibles.forEach((el, i) => {
-      el.style.maxHeight = prevHeights[i];
-    });
+    collapsibles.forEach((el, i) => { el.style.maxHeight = prevHeights[i]; });
 
-    // Restaurar nav y limpiar overlay
-    if (navOverlay && navOverlay.parentNode) {
-      navOverlay.parentNode.removeChild(navOverlay);
-      navOverlay = null;
-    }
+    // Restaurar nav y salir de modo captura
     if (navEl && prevNav) {
       navEl.style.position = prevNav.position;
       navEl.style.height = prevNav.height;
@@ -794,6 +778,7 @@ const App = () => {
       navEl.style.left = prevNav.left;
       navEl.style.zIndex = prevNav.zIndex;
     }
+    document.body.classList.remove('capture-pdf');
   };
 
   return (
@@ -818,19 +803,19 @@ const App = () => {
       @media (max-width: 1023px) { .marquee-item { font-size:1rem; padding:0 1rem; } }
       .marquee-item .icon { color:#d97706; margin-right:.5rem; display:inline-block; vertical-align:middle; }
 
-      /* Chips de Competencias base */
+      /* Chips base para "Competencias" (contraste en claro/oscuro) */
       .skill-chip{
         background-color:#e5e7eb;      /* gray-200 */
-        color:#374151;                 /* gray-700 */
-        border:1px solid #d1d5db;      /* gray-300 */
+        color:#374151;                  /* gray-700 */
+        border:1px solid #d1d5db;       /* gray-300 */
       }
       .dark .skill-chip{
-        background-color:#334155;      /* slate-700 */
-        color:#f8fafc;                 /* slate-50 */
-        border-color:#475569;          /* slate-600 */
+        background-color:#334155;       /* slate-700 */
+        color:#f8fafc;                  /* slate-50 */
+        border-color:#475569;           /* slate-600 */
       }
 
-      /* Contraste extra en oscuro para chips etiquetados como competencia-btn */
+      /* Compatibilidad: mayor contraste en oscuro para chips marcados como competencia-btn */
       .competencia-btn { }
       .dark .competencia-btn { color: #fff !important; background-color: rgba(255,255,255,0.08); }
       .dark .competencia-btn:hover { background-color: rgba(255,255,255,0.16); }
