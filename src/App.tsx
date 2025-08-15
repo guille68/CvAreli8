@@ -636,7 +636,7 @@ const App = () => {
   const [activeSection, setActiveSection] = useState('perfil');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Tema claro/oscuro estable
+  // Tema claro/oscuro estable (persistente)
   const getInitialDark = () => {
     try {
       const saved = localStorage.getItem('theme');
@@ -710,15 +710,15 @@ const App = () => {
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
     let heightLeft = imgHeight;
-    let position = 0;
+    let y = 0;
 
-    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+    pdf.addImage(imgData, 'PNG', 0, y, imgWidth, imgHeight);
     heightLeft -= pageHeight;
 
     while (heightLeft > 0) {
       pdf.addPage();
-      position = position - pageHeight;
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      y -= pageHeight; // desplazar la imagen hacia arriba por cada página nueva
+      pdf.addImage(imgData, 'PNG', 0, y, imgWidth, imgHeight);
       heightLeft -= pageHeight;
     }
 
@@ -732,6 +732,7 @@ const App = () => {
   return (
     <div
       ref={wrapperRef}
+      id="cv-container" // === AÑADIDO: compatibilidad con capturas y herramientas externas
       className="min-h-screen bg-gray-50 dark:bg-[#0b1220] font-sans antialiased text-gray-800 dark:text-gray-100"
     >
       <style>{`
@@ -750,7 +751,7 @@ const App = () => {
       @media (max-width: 1023px) { .marquee-item { font-size:1rem; padding:0 1rem; } }
       .marquee-item .icon { color:#d97706; margin-right:.5rem; display:inline-block; vertical-align:middle; }
 
-      /* Chips de Competencias con contraste en oscuro */
+      /* Chips de Competencias base */
       .skill-chip{
         background-color:#e5e7eb;      /* gray-200 */
         color:#374151;                 /* gray-700 */
@@ -760,6 +761,18 @@ const App = () => {
         background-color:#334155;      /* slate-700 */
         color:#f8fafc;                 /* slate-50 */
         border-color:#475569;          /* slate-600 */
+      }
+
+      /* === AÑADIDO: Compat .competencia-btn para mayor contraste en oscuro === */
+      .competencia-btn { /* en claro hereda de .skill-chip */ }
+      .dark .competencia-btn { color: #fff !important; background-color: rgba(255,255,255,0.08); }
+      .dark .competencia-btn:hover { background-color: rgba(255,255,255,0.16); }
+
+      /* === AÑADIDO: Tooltip en modo oscuro (sin tocar estilos en claro) === */
+      .dark .tooltip-content {
+        background-color: #0f172a;    /* slate-900 */
+        color: #e5e7eb;               /* gray-200 */
+        border: 1px solid #334155;    /* slate-700 */
       }
       `}</style>
 
@@ -817,11 +830,11 @@ const App = () => {
               <div className="flex flex-wrap gap-2">
                 {Object.entries(portfolioData.skills.tooltips).map(([label, tooltip], idx) => (
                   <div key={idx} className="relative group">
-                    <span className="skill-chip px-3 py-1 rounded-full text-sm cursor-help group-hover:shadow-md transition">
+                    <span className="skill-chip competencia-btn px-3 py-1 rounded-full text-sm cursor-help group-hover:shadow-md transition">
                       {label}
                       <Info size={12} className="inline-block ml-1 opacity-60 group-hover:opacity-100 transition-opacity" />
                     </span>
-                    <div className="absolute z-10 hidden group-hover:block bg-[#a8c0d9] text-gray-900 font-medium text-xs p-3 shadow-xl rounded-md w-64 top-full mt-1 left-1/2 -translate-x-1/2">
+                    <div className="tooltip-content absolute z-10 hidden group-hover:block bg-[#a8c0d9] text-gray-900 font-medium text-xs p-3 shadow-xl rounded-md w-64 top-full mt-1 left-1/2 -translate-x-1/2">
                       {tooltip}
                     </div>
                   </div>
