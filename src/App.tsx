@@ -7,17 +7,6 @@ import {
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
-// === Bootstrap de tema (aplica "dark" antes del 1er render) ===
-(() => {
-  try {
-    const saved = localStorage.getItem('theme');
-    const isDark = saved ? saved === 'dark' : false;
-    const root = document.documentElement;
-    if (isDark) root.classList.add('dark');
-    else root.classList.remove('dark');
-  } catch {}
-})();
-
 // ================== DATA ==================
 const portfolioData = {
   profile: [
@@ -100,7 +89,7 @@ const portfolioData = {
       description: [
         'Colaboré en el desarrollo de la estrategia comercial para el mercado de telefonía celular prepagada de la empresa AT&T.',
         'Identifiqué oportunidades de negocio para proyectos de infraestructura y fungí como enlace entre el gobierno y las empresas de construcción.',
-        'Consolidé y gestioné el arrendamiento de cuatro propiedades residenciales...',
+        'Consolidé y gestioné el arrendamiento de cuatro propiedades residenciales, lo cual incluyó la búsqueda de posibles clientes, la promoción a través de sitios web especializados y redes sociales, la negociación, así como la revisión de evaluaciones legales y contratos con firmas de abogados.',
       ],
       icon: <FileText size={24} />,
     },
@@ -112,7 +101,11 @@ const portfolioData = {
         'Mantuve y actualicé bases de datos cruciales para proyectos potenciales y clientes.',
         'Desarrollé el papel clave como intermediario principal entre el sector gubernamental y la empresa.',
         'Establecí sólidas redes institucionales para identificar valiosas oportunidades comerciales.',
-        'Logré el exitoso cierre de un proyecto para pavimentar 25 calles en la Zona Rosa (USD $35M).',
+        'Pronostiqué oportunidades de negocio, gestioné clientes potenciales y cerré exitosamente proyectos.',
+        'Encargada de la prospección, desarrollo e implementación de proyectos de infraestructura en colaboración con el gobierno.',
+        'Brindé apoyo y coordiné diversas áreas, desempeñando funciones administrativas y de gestión de proyectos (ventas, cartera, legal, calidad, planta, supervisión de obra, licitaciones, entre otros).',
+        'Logré el exitoso cierre de un proyecto para pavimentar 25 calles en el centro de la Ciudad de México, en la Zona Rosa (USD $35M).',
+        'Responsable de la generación de informes para la alta dirección.',
       ],
       icon: <HardHat size={24} />,
     },
@@ -121,9 +114,12 @@ const portfolioData = {
       title: 'Especialista Senior en Información y Enlace - Relaciones Institucionales',
       company: 'Cementos Mexicanos - CEMEX',
       description: [
-        'Estructuración e implementación de procesos administrativos alineados a políticas.',
-        'Soporte a presupuestos, informes mensuales, presentaciones institucionales...',
-        'Contribuí a la organización de información para un proyecto (USD $105M).',
+        'Al tratarse de un área nueva, desempeñé un papel fundamental en la estructuración e implementación de procesos administrativos alineados con las políticas de la empresa.',
+        'Supervisé indicadores clave para facilitar la planificación estratégica, diseñar estrategias comerciales y apoyar la toma de decisiones.',
+        'Encargada de la gestión integral y consolidación de información.',
+        'Brindé respaldo a procesos operativos y administrativos, incluyendo la elaboración y seguimiento de presupuestos, generación de informes mensuales de resultados, preparación de presentaciones institucionales, coordinación de entregas, seguimiento de pedidos, entre otros.',
+        'Participé activamente en el análisis para seleccionar proyectos y empresas a atender en esta área, en conformidad con las políticas de la empresa.',
+        'Contribuí a la organización de información crucial para un proyecto de pavimentación en una de las avenidas más importantes de la Ciudad de México (USD $105M).',
       ],
       icon: <Users size={24} />,
     },
@@ -132,8 +128,13 @@ const portfolioData = {
       title: 'Jefatura de Soporte Operativo - Ventas Institucionales',
       company: 'Cementos Mexicanos - CEMEX',
       description: [
-        'Centralización de información de ventas a nivel nacional.',
-        'Liderazgo en implementación de un ERP a nivel nacional para el segmento institucional.',
+        'Encargada de centralizar la información de ventas a nivel nacional para clientes del sector de construcción y transformadores.',
+        'Participé activamente en el análisis de términos comerciales aplicables a cada cliente del ámbito de construcción y transformación.',
+        'Responsable de implementar estrategias administrativas y brindar respaldo a las tareas operativas.',
+        'Coordiné el establecimiento de controles e indicadores fundamentales para empresas del sector de construcción.',
+        'Contribuí al éxito en la recuperación del 40% de la cartera incobrable.',
+        'Encargada de liderar la implementación de un sistema ERP (Planificación de Recursos Empresariales) a nivel nacional para el segmento institucional.',
+        'Gestioné eficazmente la estrategia de precios mediante cotizaciones y negociaciones internas específicas, tales como establecer precios por volumen, gestionar entregas, tipos de productos, entre otros.',
       ],
       icon: <BarChart size={24} />,
     },
@@ -143,9 +144,13 @@ const portfolioData = {
       title: 'AI STARS LEAGUE',
       date: 'Diciembre 2024 - Junio 2025',
       description: [
-        'Competencia internacional de alto rendimiento en IA aplicada.',
-        'Soluciones con impacto empresarial: automatización, analítica, generación de contenido con IA.',
-        'Networking con líderes tecnológicos globales.',
+        'Participación activa en una competencia internacional de alto rendimiento en inteligencia artificial aplicada.',
+        'Integré equipos multidisciplinarios para resolver desafíos reales mediante tecnologías de IA, combinando pensamiento estratégico, innovación y visión de negocio.',
+        'Diseñé y presenté soluciones con impacto empresarial, aplicando habilidades avanzadas en automatización, análisis de datos, generación de contenido con IA y desarrollo de herramientas inteligentes.',
+        'Colaboré en proyectos enfocados en transformación digital, visualización de datos y mejora de procesos organizacionales.',
+        'Fui evaluada por un panel de expertos internacionales en IA, innovación y consultoría estratégica.',
+        'La experiencia fortaleció mis competencias para integrar inteligencia artificial en contextos reales, potenciar la resolución creativa de problemas y acelerar la implementación de soluciones tecnológicas.',
+        'Participé en sesiones de capacitación técnica especializada y actividades de networking internacional con líderes y profesionales de alto nivel del ecosistema tecnológico global.',
       ],
       icon: <Brain size={24} />,
     },
@@ -158,7 +163,7 @@ const portfolioData = {
       period: '2024-2025',
       description: [
         'Programa Intensivo de Transformación Digital',
-        'Especialización en IA Aplicada para optimización de procesos empresariales.',
+        'Especialización en Inteligencia Artificial Aplicada enfocado en implementación de soluciones inteligentes, optimización de procesos empresariales y aplicación práctica de tecnologías emergentes en entornos corporativos.',
       ],
     },
     {
@@ -185,7 +190,7 @@ const portfolioData = {
   ],
   otherStudies: [
     'Diploma en Gestión Estratégica de las Finanzas Públicas; ITESM; 2016-2017.',
-    'Diploma en Mercadotecnia Competitiva; World Trade Center; 1997-1998.',
+    'Diploma en Mercadotecnia Competitiva; World Trade Center, Business Center; 1997-1998.',
     'Diploma en Finanzas; ITESM; 1994 - 1995.',
   ],
   languages: [
@@ -630,9 +635,28 @@ const ContactCard = ({
 const App = () => {
   const [activeSection, setActiveSection] = useState('perfil');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isDark, setIsDark] = useState(false);
+
+  // Tema claro/oscuro estable
+  const getInitialDark = () => {
+    try {
+      const saved = localStorage.getItem('theme');
+      if (saved) return saved === 'dark';
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    } catch {
+      return false;
+    }
+  };
+  const [isDark, setIsDark] = useState<boolean>(getInitialDark());
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', isDark);
+    try {
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    } catch {}
+  }, [isDark]);
+  const toggleDark = () => setIsDark((d) => !d);
+
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
-  const appRef = useRef<HTMLDivElement | null>(null);
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
 
   const handleNavigate = (sectionId: string) => {
     const el = sectionRefs.current[sectionId];
@@ -650,32 +674,33 @@ const App = () => {
     return () => observer.disconnect();
   }, []);
 
-  // Tema persistente
-  useEffect(() => {
-    const saved = localStorage.getItem('theme') === 'dark';
-    setIsDark(saved);
-    document.documentElement.classList.toggle('dark', saved);
-  }, []);
-  const toggleDark = () => {
-    const next = !isDark;
-    setIsDark(next);
-    document.documentElement.classList.toggle('dark', next);
-    localStorage.setItem('theme', next ? 'dark' : 'light');
-  };
-
-  // PDF: expande colapsables, captura, y restaura
+  // PDF: expande colapsables, captura TODO (nav+carousel+main), y restaura
   const handleDownloadPDF = async () => {
-    const el = appRef.current;
-    if (!el) return;
+    const root = wrapperRef.current;
+    if (!root) return;
 
-    // Expandir temporalmente todos los colapsables
-    const targets = Array.from(el.querySelectorAll<HTMLElement>('[data-collapsible-content="true"]'));
-    const prevHeights = targets.map((t) => t.style.maxHeight);
-    targets.forEach((t) => (t.style.maxHeight = `${t.scrollHeight}px`));
+    window.scrollTo(0, 0);
+
+    const collapsibles = Array.from(
+      root.querySelectorAll<HTMLElement>('[data-collapsible-content="true"]')
+    );
+    const prevHeights = collapsibles.map((el) => el.style.maxHeight);
+    collapsibles.forEach((el) => {
+      el.style.maxHeight = `${el.scrollHeight}px`;
+    });
 
     await new Promise((r) => setTimeout(r, 250));
 
-    const canvas = await html2canvas(el, { scale: 2, backgroundColor: isDark ? '#0b1220' : '#ffffff' });
+    const bg = getComputedStyle(root).backgroundColor || (isDark ? '#0b1220' : '#ffffff');
+    const canvas = await html2canvas(root, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: false,
+      backgroundColor: bg,
+      windowWidth: document.documentElement.scrollWidth,
+      windowHeight: document.documentElement.scrollHeight,
+    });
+
     const imgData = canvas.toDataURL('image/png');
     const pdf = new jsPDF('p', 'pt', 'a4');
     const pageWidth = pdf.internal.pageSize.getWidth();
@@ -699,12 +724,16 @@ const App = () => {
 
     pdf.save('CV_Areli_Aguilar.pdf');
 
-    // Restaurar alturas
-    targets.forEach((t, i) => (t.style.maxHeight = prevHeights[i]));
+    collapsibles.forEach((el, i) => {
+      el.style.maxHeight = prevHeights[i];
+    });
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[#0b1220] font-sans antialiased text-gray-800 dark:text-gray-100">
+    <div
+      ref={wrapperRef}
+      className="min-h-screen bg-gray-50 dark:bg-[#0b1220] font-sans antialiased text-gray-800 dark:text-gray-100"
+    >
       <style>{`
       /* Nombre estático */
       .static-name, .static-name span { animation: none !important; }
@@ -752,7 +781,7 @@ const App = () => {
         </div>
       </div>
 
-      <main ref={appRef} className="lg:ml-80 p-6 lg:p-8">
+      <main className="lg:ml-80 p-6 lg:p-8">
         {/* Perfil */}
         <Section ref={(el) => (sectionRefs.current.perfil = el)} id="perfil" title="Perfil Profesional">
           {portfolioData.profile.map((item, index) => (
