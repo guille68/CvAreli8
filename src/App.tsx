@@ -278,7 +278,7 @@ const TypingEffect = ({ text }: { text: string }) => {
     </h2>
   );
 };
-// ================== NAV ==================
+// ================== NAV (móvil compacto, desktop intacto) ==================
 const Navigation = ({
   activeSection,
   onNavigate,
@@ -309,66 +309,90 @@ const Navigation = ({
   return (
     <nav className="app-nav fixed lg:left-0 top-0 w-full lg:w-80 h-16 lg:h-screen bg-[#1e2a38] text-gray-200 shadow-2xl z-50">
       <div className="container mx-auto px-4 lg:px-0 h-full flex items-center justify-between lg:block">
-        <div className="lg:py-8 flex items-center lg:justify-center">
-          <div className="flex-shrink-0 flex items-center lg:flex-col lg:text-center">
+        {/* Fila superior */}
+        <div className="flex items-center justify-between lg:block lg:py-8">
+          {/* Identidad */}
+          <div className="flex items-center lg:flex-col lg:text-center">
             <User size={32} className="text-amber-600 mr-3 lg:mb-4" />
-            <div className="flex flex-col items-center">
-              {/* Tipeo solo en desktop */}
+            <div className="flex flex-col">
+              {/* Tipeo solo desktop */}
               <div className="hidden lg:block">
                 <TypingEffect text="CURRICULUM VITAE" />
               </div>
-              {/* Nombre estático (móvil más pequeño) */}
-              <h1 className="static-name font-bold font-sans text-gray-50 text-xs sm:text-xl lg:text-2xl leading-tight text-center">
+              {/* Nombre estático */}
+              <h1 className="static-name font-bold font-sans text-gray-50 text-xs sm:text-xl lg:text-2xl leading-tight">
                 <span className="block">ARELI</span>
                 <span className="block">AGUILAR</span>
                 <span className="block">DELGADO</span>
               </h1>
 
-              {/* Botones compactos y responsivos */}
-              <div className="mt-3 flex items-center gap-2">
-                {/* Toggle tema */}
+              {/* Botones desktop (se mantiene) */}
+              <div className="mt-3 hidden lg:flex items-center gap-3">
                 <button
                   onClick={toggleDark}
-                  className="w-8 h-8 lg:w-9 lg:h-9 rounded-full border border-white/30 flex items-center justify-center hover:bg-white/10 transition"
+                  className="w-9 h-9 rounded-full border border-white/30 flex items-center justify-center hover:bg-white/10 transition"
                   aria-label="Alternar modo"
                   title={isDark ? 'Modo claro' : 'Modo oscuro'}
                 >
                   {isDark ? <Sun size={18} /> : <Moon size={18} />}
                 </button>
 
-                {/* Descargar (solo icono) + tooltip al hover en desktop */}
+                {/* Descargar con tooltip hover (solo desktop) */}
                 <div className="relative group">
                   <button
                     onClick={onDownloadPDF}
-                    className="w-8 h-8 lg:w-9 lg:h-9 rounded-full border border-white/30 flex items-center justify-center hover:bg-white/10 transition"
+                    className="w-9 h-9 rounded-full border border-white/30 flex items-center justify-center hover:bg-white/10 transition"
                     aria-label="Descargar CV"
                     title="Descargar CV"
                   >
                     <Download size={18} />
                   </button>
-                  <span className="hidden lg:block pointer-events-none absolute left-1/2 -translate-x-1/2 top-full mt-1 opacity-0 group-hover:opacity-100 transition bg-white/90 text-[#1e2a38] dark:bg-slate-700 dark:text-white text-xs font-medium px-2 py-1 rounded shadow">
+                  <span className="pointer-events-none absolute left-1/2 -translate-x-1/2 top-full mt-1 opacity-0 group-hover:opacity-100 transition bg-white/90 text-[#1e2a38] dark:bg-slate-700 dark:text-white text-xs font-medium px-2 py-1 rounded shadow">
                     Descargar CV
                   </span>
                 </div>
               </div>
             </div>
           </div>
+
+          {/* Controles móviles a la derecha */}
+          <div className="flex items-center gap-2 lg:hidden">
+            <button
+              onClick={toggleDark}
+              className="w-8 h-8 rounded-full border border-white/30 flex items-center justify-center hover:bg-white/10 transition"
+              aria-label="Alternar modo"
+              title={isDark ? 'Modo claro' : 'Modo oscuro'}
+            >
+              {isDark ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
+            <button
+              onClick={onDownloadPDF}
+              className="w-8 h-8 rounded-full border border-white/30 flex items-center justify-center hover:bg-white/10 transition"
+              aria-label="Descargar CV"
+              title="Descargar CV"
+            >
+              <Download size={18} />
+            </button>
+            <button
+              onClick={toggleMobileMenu}
+              className="ml-1 text-gray-200 hover:text-gray-400 focus:outline-none"
+              aria-label="Abrir menú"
+            >
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                {isMobileMenuOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
+            </button>
+          </div>
         </div>
 
+        {/* Separador desktop */}
         <div className="hidden lg:block w-3/4 mx-auto my-4 border-t border-gray-700" />
 
-        <div className="lg:hidden">
-          <button onClick={toggleMobileMenu} className="text-gray-200 hover:text-gray-400 focus:outline-none">
-            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              {isMobileMenuOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              )}
-            </svg>
-          </button>
-        </div>
-
+        {/* Menú */}
         <div
           className={`fixed inset-x-0 top-16 bg-[#1e2a38] lg:static lg:block lg:h-auto lg:mt-8 ${
             isMobileMenuOpen ? 'block' : 'hidden'
@@ -646,7 +670,7 @@ const App = () => {
   const [activeSection, setActiveSection] = useState('perfil');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Tema claro/oscuro estable (persistente)
+  // Tema claro/oscuro estable
   const getInitialDark = () => {
     try {
       const saved = localStorage.getItem('theme');
@@ -658,7 +682,7 @@ const App = () => {
   };
   const [isDark, setIsDark] = useState<boolean>(getInitialDark());
 
-  // Aplicar 'dark' antes del primer pintado (evita parpadeo)
+  // Aplicar 'dark' antes del primer pintado (sin parpadeo)
   useLayoutEffect(() => {
     const saved = (() => {
       try { return localStorage.getItem('theme'); } catch { return null; }
@@ -775,7 +799,7 @@ const App = () => {
     });
     const safeTops = Array.from(safeTopsSet).sort((a, b) => a - b);
 
-    // Paginación por INICIOS seguros + última página forzada
+    // Paginación por inicios seguros + última página forzada
     const pageStartsPx: number[] = [0];
     const margin = 24;
     const minAdvance = 120;
@@ -786,7 +810,6 @@ const App = () => {
 
       if (limit >= canvas.height) break;
 
-      // mayor safeTop <= limit y > lastStart + minAdvance
       const candidates = safeTops.filter(v => v <= limit && v > lastStart + minAdvance);
       const nextStart = candidates.length ? candidates[candidates.length - 1] : Math.min(limit, canvas.height);
       if (nextStart <= lastStart + 1) break;
@@ -794,7 +817,6 @@ const App = () => {
       pageStartsPx.push(nextStart);
     }
 
-    // Si aún queda contenido sin cubrir, fuerza última página
     const lastStartNeeded = canvas.height - domPageHeight;
     if (lastStartNeeded > pageStartsPx[pageStartsPx.length - 1] + minAdvance) {
       pageStartsPx.push(Math.max(0, Math.round(lastStartNeeded)));
@@ -832,7 +854,7 @@ const App = () => {
       .typing-cursor { display:inline-block; animation: blink-caret 0.75s step-end infinite; opacity:1; }
       @keyframes blink-caret { from,to{opacity:0;} 50%{opacity:1;} }
 
-      /* Carrusel (loop continuo sin huecos, tipografía más sutil) */
+      /* Carrusel continuo sin huecos */
       @keyframes marquee {
         from { transform: translateX(0); }
         to   { transform: translateX(-50%); }
@@ -841,11 +863,10 @@ const App = () => {
         display: flex;
         height: 100%;
         width: max-content;
-        animation: marquee 30s linear infinite; /* para acelerar reduce p.ej. a 48s */
+        animation: marquee 60s linear infinite; /* ajusta a 48s para más velocidad */
         will-change: transform;
       }
       .marquee-container.paused { animation-play-state: paused; }
-
       .marquee-item {
         flex-shrink: 0;
         display: flex;
@@ -862,27 +883,17 @@ const App = () => {
       }
       .marquee-item .icon { color:#d97706; margin-right:.5rem; display:inline-block; vertical-align:middle; }
 
-      /* Chips base */
+      /* Chips */
       .skill-chip{ background-color:#e5e7eb; color:#374151; border:1px solid #d1d5db; }
       .dark .skill-chip{ background-color:#334155; color:#f8fafc; border-color:#475569; }
 
-      /* Contraste extra en oscuro para chips marcados como competencia-btn */
-      .competencia-btn { }
-      .dark .competencia-btn { color: #fff !important; background-color: rgba(255,255,255,0.08); }
-      .dark .competencia-btn:hover { background-color: rgba(255,255,255,0.16); }
+      /* Contraste extra en oscuro para las competencias */
+      .dark .competencia-btn { color:#fff !important; background-color:rgba(255,255,255,0.08); }
+      .dark .competencia-btn:hover { background-color:rgba(255,255,255,0.16); }
 
-      /* Tooltip modo claro: azul suave original (legible) */
-      .tooltip-content {
-        background-color: #a8c0d9;
-        color: #0f172a;
-        border: 1px solid #93a8c3;
-      }
-      /* Tooltip modo oscuro — opción 3 (gris azulado) */
-      .dark .tooltip-content {
-        background-color: #475569;
-        color: #ffffff;
-        border: 1px solid #94A3B8;
-      }
+      /* Tooltip: azul en claro, gris azulado en oscuro */
+      .tooltip-content { background-color:#a8c0d9; color:#0f172a; border:1px solid #93a8c3; }
+      .dark .tooltip-content { background-color:#475569; color:#fff; border:1px solid #94A3B8; }
       `}</style>
 
       <Navigation
