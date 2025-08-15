@@ -841,7 +841,7 @@ const App = () => {
         display: flex;
         height: 100%;
         width: max-content;
-        animation: marquee 60s linear infinite; /* para acelerar reduce p.ej. a 48s */
+        animation: marquee 30s linear infinite; /* para acelerar reduce p.ej. a 48s */
         will-change: transform;
       }
       .marquee-container.paused { animation-play-state: paused; }
