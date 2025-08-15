@@ -691,15 +691,14 @@ const App = () => {
     return () => observer.disconnect();
   }, []);
 
-  // PDF: expandir colapsables, estirar lateral azul (buffer) y cortar en límites de sección/cards
+  // PDF: no cortar dentro de tarjetas/ítems y barra azul hasta el final
   const handleDownloadPDF = async () => {
     const root = wrapperRef.current;
     if (!root) return;
 
-    // 1) Activar modo captura
     document.body.classList.add('capture-pdf');
 
-    // 2) Estirar lateral azul mucho más que el documento
+    // Forzar barra azul a cubrir TODO: posición absoluta + gran altura
     const navEl = root.querySelector('.app-nav') as HTMLElement | null;
     const prevNav = navEl
       ? {
@@ -717,10 +716,14 @@ const App = () => {
       root.scrollHeight
     );
     if (navEl) {
-      navEl.style.height = `${docH + 5000}px`; // buffer generoso ⇒ siempre llega a Contacto
+      navEl.style.position = 'absolute';
+      navEl.style.top = '0';
+      navEl.style.left = '0';
+      navEl.style.height = `${docH + 5000}px`; // buffer generoso
+      navEl.style.zIndex = '0';
     }
 
-    // 3) Ir al tope y expandir colapsables
+    // Expandir colapsables
     window.scrollTo(0, 0);
     const collapsibles = Array.from(
       root.querySelectorAll<HTMLElement>('[data-collapsible-content="true"]')
@@ -730,7 +733,7 @@ const App = () => {
 
     await new Promise((r) => setTimeout(r, 250));
 
-    // 4) Captura
+    // Captura
     const bg = getComputedStyle(root).backgroundColor || (isDark ? '#0b1220' : '#ffffff');
     const canvas = await html2canvas(root, {
       scale: 2,
@@ -743,7 +746,7 @@ const App = () => {
       scrollY: -window.scrollY,
     });
 
-    // 5) PDF y conversiones
+    // PDF base
     const imgData = canvas.toDataURL('image/png');
     const pdf = new jsPDF('p', 'pt', 'a4');
     const pageWidth = pdf.internal.pageSize.getWidth();
@@ -751,40 +754,42 @@ const App = () => {
     const imgWidth = pageWidth;
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-    const pxToPdf = imgWidth / canvas.width;   // pt por px DOM
-    const pdfToPx = 1 / pxToPdf;               // px DOM por pt
+    // Conversión DOMpx <-> PDFpt
+    const pxToPdf = imgWidth / canvas.width;
+    const pdfToPx = 1 / pxToPdf;
     const domPageHeight = pageHeight * pdfToPx;
 
-    // 6) Puntos de corte seguros: .cv-section y .cv-break
+    // Anclas seguras (secciones + tarjetas/ítems)
     const rootRect = root.getBoundingClientRect();
     const safeNodes = Array.from(root.querySelectorAll<HTMLElement>('.cv-section, .cv-break'));
-    const safeTopsSet = new Set<number>();
-    safeTopsSet.add(0);
+    const safeTopsSet = new Set<number>([0, canvas.height]);
     safeNodes.forEach((n) => {
-      const rect = n.getBoundingClientRect();
-      const topAbs = rect.top - rootRect.top + window.scrollY;
-      safeTopsSet.add(Math.max(0, Math.round(topAbs))); // normaliza para evitar subpíxeles
+      const r = n.getBoundingClientRect();
+      const topAbs = r.top - rootRect.top + window.scrollY;
+      safeTopsSet.add(Math.max(0, Math.round(topAbs)));
     });
-    safeTopsSet.add(canvas.height);
     const safeTops = Array.from(safeTopsSet).sort((a, b) => a - b);
 
-    // 7) Construcción de páginas usando los cortes seguros
-    const pageStartsPx: number[] = [];
-    let currentStart = 0;
-    const margin = 24;       // holgura
-    const minAdvance = 120;  // avanzar al menos 120px entre páginas
+    // Paginación por "final de página" (end-aligned)
+    const pageEndsPx: number[] = [];
+    let currentEnd = domPageHeight; // primera página aprox. una hoja
+    const margin = 24;
+    const minAdvance = 120;
 
-    while (currentStart < canvas.height - 1) {
-      const limit = currentStart + domPageHeight - margin;
-      const candidates = safeTops.filter(v => v > currentStart + minAdvance && v <= limit);
-      const nextStart = candidates.length ? candidates[candidates.length - 1] : Math.min(limit, canvas.height);
-      pageStartsPx.push(currentStart);
-      if (nextStart <= currentStart + 1) break;
-      currentStart = nextStart;
+    while (currentEnd < canvas.height + 1) {
+      const limit = currentEnd - margin;
+      // Tomar el mayor "safeTop" <= limit
+      const candidates = safeTops.filter(v => v <= limit && v >= (pageEndsPx[pageEndsPx.length - 1] || 0) + minAdvance);
+      const endPx = candidates.length ? candidates[candidates.length - 1] : Math.max(0, Math.round(limit));
+      pageEndsPx.push(endPx);
+
+      if (endPx >= canvas.height) break; // llegamos al final
+      currentEnd = endPx + domPageHeight;
     }
 
-    // 8) Añadir páginas respetando cortes
-    pageStartsPx.forEach((startPx, idx) => {
+    // Pintar páginas usando los "finales" calculados
+    pageEndsPx.forEach((endPx, idx) => {
+      const startPx = Math.max(0, Math.round(endPx - domPageHeight)); // región [start, end]
       if (idx > 0) pdf.addPage();
       const yPdf = -startPx * pxToPdf;
       pdf.addImage(imgData, 'PNG', 0, yPdf, imgWidth, imgHeight);
@@ -792,7 +797,7 @@ const App = () => {
 
     pdf.save('CV_Areli_Aguilar.pdf');
 
-    // 9) Restaurar
+    // Restaurar
     collapsibles.forEach((el, i) => { el.style.maxHeight = prevHeights[i]; });
     if (navEl && prevNav) {
       navEl.style.position = prevNav.position;
@@ -824,7 +829,7 @@ const App = () => {
         display: flex;
         height: 100%;
         width: max-content;
-        animation: marquee 23s linear infinite; /* más rápido ⇒ reduce este valor, p.ej. 48s */
+        animation: marquee 60s linear infinite; /* para acelerar reduce p.ej. a 48s */
         will-change: transform;
       }
       .marquee-container.paused { animation-play-state: paused; }
@@ -849,11 +854,17 @@ const App = () => {
       .skill-chip{ background-color:#e5e7eb; color:#374151; border:1px solid #d1d5db; }
       .dark .skill-chip{ background-color:#334155; color:#f8fafc; border-color:#475569; }
 
-      /* Contraste extra en oscuro para chips marcardos como competencia-btn */
+      /* Contraste extra en oscuro para chips marcados como competencia-btn */
       .competencia-btn { }
       .dark .competencia-btn { color: #fff !important; background-color: rgba(255,255,255,0.08); }
       .dark .competencia-btn:hover { background-color: rgba(255,255,255,0.16); }
 
+      /* Tooltip en modo claro — fondo azul suave y texto legible */
+      .tooltip-content {
+        background-color: #a8c0d9; /* azul suave original */
+        color: #0f172a;            /* contraste alto */
+        border: 1px solid #93a8c3; /* borde sutil */
+      }
       /* Tooltip en modo oscuro — Opción 3 (gris azulado) */
       .dark .tooltip-content {
         background-color: #475569;  /* slate-600 */
