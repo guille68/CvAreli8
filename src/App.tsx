@@ -309,24 +309,22 @@ const Navigation = ({
   return (
     <nav className="app-nav fixed lg:left-0 top-0 w-full lg:w-80 h-16 lg:h-screen bg-[#1e2a38] text-gray-200 shadow-2xl z-50">
       <div className="container mx-auto px-4 lg:px-0 h-full flex items-center justify-between lg:block">
-        {/* Fila superior (relative + w-full para que right-4 pegue al borde real) */}
+        {/* Fila superior */}
         <div className="relative w-full flex items-center lg:block lg:py-8">
-          {/* Identidad: reservar espacio a la derecha en móvil */}
+          {/* Identidad */}
           <div className="flex items-center lg:flex-col lg:items-center lg:text-center pr-32 lg:pr-0">
             <User size={32} className="text-amber-600 mr-3 lg:mb-4" />
             <div className="flex flex-col">
-              {/* Título SOLO desktop */}
               <div className="hidden lg:block w-[240px] overflow-hidden">
                 <TypingEffect text="CURRICULUM VITAE" />
               </div>
-              {/* Nombre */}
               <h1 className="static-name font-bold font-sans text-gray-50 text-xs sm:text-xl lg:text-2xl leading-tight">
                 <span className="block">ARELI</span>
                 <span className="block">AGUILAR</span>
                 <span className="block">DELGADO</span>
               </h1>
 
-              {/* Botones desktop (centrados) */}
+              {/* Botones desktop */}
               <div className="mt-3 hidden lg:flex items-center justify-center gap-3">
                 <button
                   onClick={toggleDark}
@@ -353,7 +351,7 @@ const Navigation = ({
             </div>
           </div>
 
-          {/* CONTROLES MÓVILES: fijos a la derecha */}
+          {/* CONTROLES MÓVILES */}
           <div className="lg:hidden absolute right-4 top-1/2 -translate-y-1/2 z-10 flex items-center gap-2">
             <button
               onClick={toggleDark}
@@ -391,23 +389,14 @@ const Navigation = ({
         <div className="hidden lg:block w-3/4 mx-auto my-4 border-t border-gray-700" />
 
         {/* Menú secciones */}
-        <div
-          className={`fixed inset-x-0 top-16 bg-[#1e2a38] lg:static lg:block lg:h-auto lg:mt-8 ${
-            isMobileMenuOpen ? 'block' : 'hidden'
-          }`}
-        >
+        <div className={`fixed inset-x-0 top-16 bg-[#1e2a38] lg:static lg:block lg:h-auto lg:mt-8 ${isMobileMenuOpen ? 'block' : 'hidden'}`}>
           <ul className="flex flex-col lg:space-y-2 p-4 lg:p-0">
             {sections.map((section) => (
               <li key={section.id}>
                 <a
                   href={`#${section.id}`}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onNavigate(section.id);
-                  }}
-                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors duration-200 ${
-                    activeSection === section.id ? 'bg-[#4a688b] text-white shadow-lg' : 'hover:bg-gray-800'
-                  }`}
+                  onClick={(e) => { e.preventDefault(); onNavigate(section.id); }}
+                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors duration-200 ${activeSection === section.id ? 'bg-[#4a688b] text-white shadow-lg' : 'hover:bg-gray-800'}`}
                 >
                   {section.icon}
                   <span className="font-semibold">{section.title}</span>
@@ -691,7 +680,7 @@ const App = () => {
     return () => observer.disconnect();
   }, []);
 
-  // --- DESCARGA PDF (móvil con fallback, desktop con franja azul extendida y paginado seguro) ---
+  // --- DESCARGA PDF (sin secciones duplicadas entre páginas) ---
   const handleDownloadPDF = async () => {
     const root = wrapperRef.current;
     if (!root) return;
@@ -700,7 +689,7 @@ const App = () => {
       document.body.classList.add('capture-pdf');
     }
 
-    // Expandir colapsables
+    // Expandir colapsables para incluir todo
     window.scrollTo(0, 0);
     const collapsibles = Array.from(root.querySelectorAll<HTMLElement>('[data-collapsible-content="true"]'));
     const prevHeights = collapsibles.map((el) => el.style.maxHeight);
@@ -727,43 +716,52 @@ const App = () => {
     const imgWidth = pageWidth;
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-    // Paginado con anclas seguras
+    // ===== Paginado sin solapamientos =====
     const pxToPdf = imgWidth / canvas.width;
     const pdfToPx = 1 / pxToPdf;
     const domPageHeight = pageHeight * pdfToPx;
 
     const rootRect = root.getBoundingClientRect();
-    const safeNodes = Array.from(root.querySelectorAll<HTMLElement>('.cv-section, .cv-break'));
-    const tops = new Set<number>([0, canvas.height]);
-    safeNodes.forEach(n => {
-      const r = n.getBoundingClientRect();
-      tops.add(Math.max(0, Math.round(r.top - rootRect.top + window.scrollY)));
-    });
-    const safeTops = Array.from(tops).sort((a,b)=>a-b);
+    const anchorNodes = Array.from(root.querySelectorAll<HTMLElement>('.cv-section, .cv-break'));
+    const rawTops = anchorNodes.map(n =>
+      Math.max(0, Math.round(n.getBoundingClientRect().top - rootRect.top + window.scrollY))
+    );
+    rawTops.push(0, canvas.height);
+
+    const safeTops = Array.from(new Set(rawTops)).sort((a, b) => a - b);
 
     const starts: number[] = [0];
-    const margin = 24;
-    const minAdvance = 120;
+    const margin = 24;      // margen inferior visual
+    const minAdvance = 96;  // avance mínimo entre páginas
+
     while (true) {
       const last = starts[starts.length - 1];
       const limit = last + domPageHeight - margin;
       if (limit >= canvas.height) break;
-      const cand = safeTops.filter(v => v <= limit && v > last + minAdvance);
-      const next = cand.length ? cand[cand.length - 1] : Math.min(limit, canvas.height);
-      if (next <= last + 1) break;
-      starts.push(next);
-    }
-    const lastNeed = canvas.height - domPageHeight;
-    if (lastNeed > (starts[starts.length - 1] ?? 0) + minAdvance) {
-      starts.push(Math.max(0, Math.round(lastNeed)));
+
+      // PRIMER anchor >= limit (evita retrocesos y duplicados)
+      let next = safeTops.find(v => v >= limit);
+
+      if (next === undefined) next = Math.min(limit, canvas.height);
+      if (next <= last + minAdvance) next = last + domPageHeight;
+      next = Math.min(next, canvas.height - 1);
+      if (next <= last) break;
+
+      starts.push(Math.round(next));
     }
 
-    starts.forEach((startPx, idx) => {
+    const lastStart = starts[starts.length - 1];
+    if (lastStart + domPageHeight < canvas.height - 1) {
+      starts.push(canvas.height - Math.min(canvas.height, domPageHeight));
+    }
+
+    const uniqStarts = Array.from(new Set(starts)).sort((a, b) => a - b);
+    uniqStarts.forEach((startPx, idx) => {
       if (idx > 0) pdf.addPage();
       pdf.addImage(imgData, 'PNG', 0, -startPx * pxToPdf, imgWidth, imgHeight);
     });
 
-    // Guardado: desktop normal; móvil -> Blob fallback
+    // Guardado con fallback móvil
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     if (isMobile) {
       const blob = pdf.output('blob');
@@ -774,10 +772,7 @@ const App = () => {
       a.download = 'CV_Areli_Aguilar.pdf';
       document.body.appendChild(a);
       a.click();
-      setTimeout(() => {
-        URL.revokeObjectURL(url);
-        a.remove();
-      }, 1200);
+      setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1200);
     } else {
       pdf.save('CV_Areli_Aguilar.pdf');
     }
@@ -793,34 +788,27 @@ const App = () => {
       className="min-h-screen bg-gray-50 dark:bg-[#0b1220] font-sans antialiased text-gray-800 dark:text-gray-100"
     >
       <style>{`
-      .typing-cursor { display:inline-block; animation: blink-caret .75s step-end infinite; opacity:1; }
-      @keyframes blink-caret { from,to{opacity:0;} 50%{opacity:1;} }
+      .typing-cursor{display:inline-block;animation:blink-caret .75s step-end infinite;opacity:1}
+      @keyframes blink-caret{from,to{opacity:0}50%{opacity:1}}
 
-      @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-      .marquee-container { display:flex; height:100%; width:max-content; animation:marquee 30s linear infinite; will-change:transform; }
-      .marquee-container.paused { animation-play-state: paused; }
-      .marquee-item { flex-shrink:0; display:flex; align-items:center; white-space:nowrap; padding:0 1.75rem; font-family:'Inter', sans-serif; font-size:1.1rem; font-weight:400; color:#4a688b; }
-      @media (max-width:1023px){ .marquee-item{ font-size:.95rem; padding:0 1rem; } }
-      .marquee-item .icon { color:#d97706; margin-right:.5rem; display:inline-block; vertical-align:middle; }
+      @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+      .marquee-container{display:flex;height:100%;width:max-content;animation:marquee 60s linear infinite;will-change:transform}
+      .marquee-container.paused{animation-play-state:paused}
+      .marquee-item{flex-shrink:0;display:flex;align-items:center;white-space:nowrap;padding:0 1.75rem;font-family:'Inter',sans-serif;font-size:1.1rem;font-weight:400;color:#4a688b}
+      @media (max-width:1023px){.marquee-item{font-size:.95rem;padding:0 1rem}}
+      .marquee-item .icon{color:#d97706;margin-right:.5rem;display:inline-block;vertical-align:middle}
 
-      .skill-chip{ background-color:#e5e7eb; color:#374151; border:1px solid #d1d5db; }
-      .dark .skill-chip{ background-color:#334155; color:#f8fafc; border-color:#475569; }
-      .dark .competencia-btn{ color:#fff !important; background-color:rgba(255,255,255,.08); }
-      .dark .competencia-btn:hover{ background-color:rgba(255,255,255,.16); }
+      .skill-chip{background-color:#e5e7eb;color:#374151;border:1px solid #d1d5db}
+      .dark .skill-chip{background-color:#334155;color:#f8fafc;border-color:#475569}
+      .dark .competencia-btn{color:#fff!important;background-color:rgba(255,255,255,.08)}
+      .dark .competencia-btn:hover{background-color:rgba(255,255,255,.16)}
+      .tooltip-content{background-color:#a8c0d9;color:#0f172a;border:1px solid #93a8c3}
+      .dark .tooltip-content{background-color:#475569;color:#fff;border:1px solid #94A3B8}
 
-      .tooltip-content{ background-color:#a8c0d9; color:#0f172a; border:1px solid #93a8c3; }
-      .dark .tooltip-content{ background-color:#475569; color:#fff; border:1px solid #94A3B8; }
-
-      /* Franja azul extendida SOLO durante la captura (desktop) */
+      /* Franja azul extendida SOLO durante captura (desktop) */
       @media (min-width:1024px){
         .capture-pdf .app-nav::after{
-          content:"";
-          position:fixed;
-          left:0; top:0;
-          width:20rem; /* lg:w-80 */
-          height:20000px;
-          background:#1e2a38;
-          z-index:-1;
+          content:"";position:fixed;left:0;top:0;width:20rem;height:20000px;background:#1e2a38;z-index:-1
         }
       }
       `}</style>
@@ -835,7 +823,7 @@ const App = () => {
         onDownloadPDF={handleDownloadPDF}
       />
 
-      {/* Carrusel superior y "CURRICULUM VITAE" en móvil */}
+      {/* Carrusel y título móvil */}
       <div className="pt-16 lg:pt-0 lg:ml-80">
         <MarqueeCarousel />
         <div className="px-4 pt-2 block lg:hidden">
