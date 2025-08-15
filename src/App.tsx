@@ -680,7 +680,7 @@ const App = () => {
     return () => observer.disconnect();
   }, []);
 
-  // --- DESCARGA PDF (sin secciones duplicadas entre páginas) ---
+  // --- DESCARGA PDF (captura completa + paginado robusto) ---
   const handleDownloadPDF = async () => {
     const root = wrapperRef.current;
     if (!root) return;
@@ -689,7 +689,7 @@ const App = () => {
       document.body.classList.add('capture-pdf');
     }
 
-    // Expandir colapsables para incluir todo
+    // Expandir colapsables
     window.scrollTo(0, 0);
     const collapsibles = Array.from(root.querySelectorAll<HTMLElement>('[data-collapsible-content="true"]'));
     const prevHeights = collapsibles.map((el) => el.style.maxHeight);
@@ -697,16 +697,22 @@ const App = () => {
 
     await new Promise((r) => setTimeout(r, 250));
 
+    // Tamaño REAL del contenedor para que entre TODO
+    const totalWidth  = Math.max(root.scrollWidth,  root.offsetWidth,  root.clientWidth);
+    const totalHeight = Math.max(root.scrollHeight, root.offsetHeight, root.clientHeight);
+
     const bg = getComputedStyle(root).backgroundColor || (isDark ? '#0b1220' : '#ffffff');
     const canvas = await html2canvas(root, {
       scale: 2,
       useCORS: true,
       allowTaint: false,
       backgroundColor: bg,
-      windowWidth: document.documentElement.scrollWidth,
-      windowHeight: document.documentElement.scrollHeight,
+      windowWidth: totalWidth,
+      windowHeight: totalHeight,
+      width: totalWidth,
+      height: totalHeight,
       scrollX: 0,
-      scrollY: -window.scrollY,
+      scrollY: 0,
     });
 
     const imgData = canvas.toDataURL('image/png');
@@ -716,7 +722,7 @@ const App = () => {
     const imgWidth = pageWidth;
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-    // ===== Paginado sin solapamientos =====
+    // ===== Paginado sin solapes ni recortes finales =====
     const pxToPdf = imgWidth / canvas.width;
     const pdfToPx = 1 / pxToPdf;
     const domPageHeight = pageHeight * pdfToPx;
@@ -731,28 +737,30 @@ const App = () => {
     const safeTops = Array.from(new Set(rawTops)).sort((a, b) => a - b);
 
     const starts: number[] = [0];
-    const margin = 24;      // margen inferior visual
-    const minAdvance = 96;  // avance mínimo entre páginas
+    const margin = 24;
+    const minAdvance = 96;
 
     while (true) {
       const last = starts[starts.length - 1];
       const limit = last + domPageHeight - margin;
       if (limit >= canvas.height) break;
 
-      // PRIMER anchor >= limit (evita retrocesos y duplicados)
+      // primer anchor >= limit (no retroceder)
+      const lastPossibleStart = Math.max(0, canvas.height - domPageHeight);
       let next = safeTops.find(v => v >= limit);
 
-      if (next === undefined) next = Math.min(limit, canvas.height);
-      if (next <= last + minAdvance) next = last + domPageHeight;
-      next = Math.min(next, canvas.height - 1);
+      if (next === undefined) next = lastPossibleStart;
+      else if (next > lastPossibleStart) next = lastPossibleStart;
+
+      if (next <= last + minAdvance) next = Math.min(last + domPageHeight, lastPossibleStart);
       if (next <= last) break;
 
       starts.push(Math.round(next));
     }
 
     const lastStart = starts[starts.length - 1];
-    if (lastStart + domPageHeight < canvas.height - 1) {
-      starts.push(canvas.height - Math.min(canvas.height, domPageHeight));
+    if (lastStart + domPageHeight < canvas.height) {
+      starts.push(Math.max(0, Math.round(canvas.height - domPageHeight)));
     }
 
     const uniqStarts = Array.from(new Set(starts)).sort((a, b) => a - b);
@@ -792,7 +800,7 @@ const App = () => {
       @keyframes blink-caret{from,to{opacity:0}50%{opacity:1}}
 
       @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-      .marquee-container{display:flex;height:100%;width:max-content;animation:marquee 30s linear infinite;will-change:transform}
+      .marquee-container{display:flex;height:100%;width:max-content;animation:marquee 60s linear infinite;will-change:transform}
       .marquee-container.paused{animation-play-state:paused}
       .marquee-item{flex-shrink:0;display:flex;align-items:center;white-space:nowrap;padding:0 1.75rem;font-family:'Inter',sans-serif;font-size:1.1rem;font-weight:400;color:#4a688b}
       @media (max-width:1023px){.marquee-item{font-size:.95rem;padding:0 1rem}}
