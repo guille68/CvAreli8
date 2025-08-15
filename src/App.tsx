@@ -10,26 +10,10 @@ import html2canvas from 'html2canvas';
 // ================== DATA ==================
 const portfolioData = {
   profile: [
-    {
-      icon: <Briefcase size={24} />,
-      text:
-        'Ejecutiva bilingüe (inglés/español) con más de 20 años de experiencia en desarrollo de negocios, gestión estratégica de proyectos y análisis de información clave para la toma de decisiones de alta dirección.',
-    },
-    {
-      icon: <Settings size={24} />,
-      text:
-        'Mi trayectoria combina habilidades avanzadas en planeación y gestión administrativa con una visión estratégica orientada a la transformación digital. Integro tecnologías emergentes - incluida la inteligencia artificial- para modernizar procesos, fortalecer la gestión empresarial y optimizar la toma de decisiones, impulsando la eficiencia operativa y la identificación de oportunidades estratégicas.',
-    },
-    {
-      icon: <Bot size={24} />,
-      text:
-        'Actualmente participo en equipos interdisciplinarios que aplican inteligencia artificial en entornos empresariales, desarrollando soluciones innovadoras con impacto tangible en la organización.',
-    },
-    {
-      icon: <Handshake size={24} />,
-      text:
-        'Cuento con amplia experiencia generando relaciones comerciales estratégicas entre organizaciones privadas y públicas, mediante propuestas alineadas con objetivos corporativos. Me distingo por mi capacidad para identificar necesidades del cliente, gestionar ventas de forma estructurada y construir vínculos institucionales sólidos. Tengo una orientación constante a resultados y un firme compromiso con el cumplimiento de metas organizacionales.',
-    },
+    { icon: <Briefcase size={24} />, text: 'Ejecutiva bilingüe (inglés/español) con más de 20 años de experiencia en desarrollo de negocios, gestión estratégica de proyectos y análisis de información clave para la toma de decisiones de alta dirección.' },
+    { icon: <Settings size={24} />, text: 'Mi trayectoria combina habilidades avanzadas en planeación y gestión administrativa con una visión estratégica orientada a la transformación digital. Integro tecnologías emergentes - incluida la inteligencia artificial- para modernizar procesos, fortalecer la gestión empresarial y optimizar la toma de decisiones, impulsando la eficiencia operativa y la identificación de oportunidades estratégicas.' },
+    { icon: <Bot size={24} />, text: 'Actualmente participo en equipos interdisciplinarios que aplican inteligencia artificial en entornos empresariales, desarrollando soluciones innovadoras con impacto tangible en la organización.' },
+    { icon: <Handshake size={24} />, text: 'Cuento con amplia experiencia generando relaciones comerciales estratégicas entre organizaciones privadas y públicas, mediante propuestas alineadas con objetivos corporativos. Me distingo por mi capacidad para identificar necesidades del cliente, gestionar ventas de forma estructurada y construir vínculos institucionales sólidos. Tengo una orientación constante a resultados y un firme compromiso con el cumplimiento de metas organizacionales.' },
   ],
   skills: {
     tooltips: {
@@ -156,37 +140,10 @@ const portfolioData = {
     },
   ],
   education: [
-    {
-      icon: <Brain size={24} />,
-      iconColor: '#8B5CF6',
-      title: 'LEARNING HEROES',
-      period: '2024-2025',
-      description: [
-        'Programa Intensivo de Transformación Digital',
-        'Especialización en Inteligencia Artificial Aplicada enfocado en implementación de soluciones inteligentes, optimización de procesos empresariales y aplicación práctica de tecnologías emergentes en entornos corporativos.',
-      ],
-    },
-    {
-      icon: <BookOpen size={24} />,
-      iconColor: '#8B5CF6',
-      title: 'Diplomado en Marketing Digital',
-      period: '2022',
-      description: 'ITAM',
-    },
-    {
-      icon: <Landmark size={24} />,
-      iconColor: '#3B82F6',
-      title: 'ITESM',
-      period: '2002-2004',
-      description: 'Master en Administración de Negocios (MBA)',
-    },
-    {
-      icon: <Landmark size={24} />,
-      iconColor: '#3B82F6',
-      title: 'ITESM',
-      period: '1991-1995',
-      description: 'Licenciatura en Mercadotecnia (Mención Honorífica)',
-    },
+    { icon: <Brain size={24} />, iconColor: '#8B5CF6', title: 'LEARNING HEROES', period: '2024-2025', description: ['Programa Intensivo de Transformación Digital','Especialización en Inteligencia Artificial Aplicada enfocado en implementación de soluciones inteligentes, optimización de procesos empresariales y aplicación práctica de tecnologías emergentes en entornos corporativos.'] },
+    { icon: <BookOpen size={24} />, iconColor: '#8B5CF6', title: 'Diplomado en Marketing Digital', period: '2022', description: 'ITAM' },
+    { icon: <Landmark size={24} />, iconColor: '#3B82F6', title: 'ITESM', period: '2002-2004', description: 'Master en Administración de Negocios (MBA)' },
+    { icon: <Landmark size={24} />, iconColor: '#3B82F6', title: 'ITESM', period: '1991-1995', description: 'Licenciatura en Mercadotecnia (Mención Honorífica)' },
   ],
   otherStudies: [
     'Diploma en Gestión Estratégica de las Finanzas Públicas; ITESM; 2016-2017.',
@@ -278,7 +235,7 @@ const TypingEffect = ({ text }: { text: string }) => {
     </h2>
   );
 };
-// ================== NAV (móvil fijo y desktop centrado) ==================
+// ================== NAV (móvil: controles ABSOLUTE a la derecha) ==================
 const Navigation = ({
   activeSection,
   onNavigate,
@@ -309,24 +266,21 @@ const Navigation = ({
   return (
     <nav className="app-nav fixed lg:left-0 top-0 w-full lg:w-80 h-16 lg:h-screen bg-[#1e2a38] text-gray-200 shadow-2xl z-50">
       <div className="container mx-auto px-4 lg:px-0 h-full flex items-center justify-between lg:block">
-        {/* Fila superior */}
-        <div className="flex items-center justify-between lg:block lg:py-8">
-          {/* Identidad (izquierda) */}
-          <div className="flex items-center lg:flex-col lg:items-center lg:text-center flex-1 min-w-0">
+        {/* Fila superior (relative para posicionar los controles) */}
+        <div className="relative flex items-center lg:block lg:py-8">
+          {/* Identidad (reservamos espacio a la derecha en móvil) */}
+          <div className="flex items-center lg:flex-col lg:items-center lg:text-center pr-28 lg:pr-0">
             <User size={32} className="text-amber-600 mr-3 lg:mb-4" />
-            <div className="flex flex-col min-w-0">
-              {/* Título SOLO desktop (no empuja botones) */}
+            <div className="flex flex-col">
               <div className="hidden lg:block w-[240px] overflow-hidden">
                 <TypingEffect text="CURRICULUM VITAE" />
               </div>
-              {/* Nombre */}
               <h1 className="static-name font-bold font-sans text-gray-50 text-xs sm:text-xl lg:text-2xl leading-tight">
                 <span className="block">ARELI</span>
                 <span className="block">AGUILAR</span>
                 <span className="block">DELGADO</span>
               </h1>
-
-              {/* Botones desktop (centrados) */}
+              {/* Botones desktop centrados bajo el nombre */}
               <div className="mt-3 hidden lg:flex items-center justify-center gap-3">
                 <button
                   onClick={toggleDark}
@@ -353,8 +307,8 @@ const Navigation = ({
             </div>
           </div>
 
-          {/* Controles móviles a la derecha (SIEMPRE visibles) */}
-          <div className="flex items-center gap-2 lg:hidden shrink-0">
+          {/* CONTROLES MÓVILES FIJOS A LA DERECHA (ABSOLUTE) */}
+          <div className="lg:hidden absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
             <button
               onClick={toggleDark}
               className="w-8 h-8 rounded-full border border-white/30 flex items-center justify-center hover:bg-white/10 transition focus:outline-none"
@@ -373,7 +327,7 @@ const Navigation = ({
             </button>
             <button
               onClick={toggleMobileMenu}
-              className="ml-1 text-gray-200 hover:text-gray-400 focus:outline-none"
+              className="text-gray-200 hover:text-gray-400 focus:outline-none"
               aria-label="Abrir menú"
             >
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -391,23 +345,14 @@ const Navigation = ({
         <div className="hidden lg:block w-3/4 mx-auto my-4 border-t border-gray-700" />
 
         {/* Menú secciones */}
-        <div
-          className={`fixed inset-x-0 top-16 bg-[#1e2a38] lg:static lg:block lg:h-auto lg:mt-8 ${
-            isMobileMenuOpen ? 'block' : 'hidden'
-          }`}
-        >
+        <div className={`fixed inset-x-0 top-16 bg-[#1e2a38] lg:static lg:block lg:h-auto lg:mt-8 ${isMobileMenuOpen ? 'block' : 'hidden'}`}>
           <ul className="flex flex-col lg:space-y-2 p-4 lg:p-0">
             {sections.map((section) => (
               <li key={section.id}>
                 <a
                   href={`#${section.id}`}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onNavigate(section.id);
-                  }}
-                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors duration-200 ${
-                    activeSection === section.id ? 'bg-[#4a688b] text-white shadow-lg' : 'hover:bg-gray-800'
-                  }`}
+                  onClick={(e) => { e.preventDefault(); onNavigate(section.id); }}
+                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors duration-200 ${activeSection === section.id ? 'bg-[#4a688b] text-white shadow-lg' : 'hover:bg-gray-800'}`}
                 >
                   {section.icon}
                   <span className="font-semibold">{section.title}</span>
@@ -422,64 +367,38 @@ const Navigation = ({
 };
 
 // ================== SECCIÓN GENÉRICA ==================
-const Section = forwardRef(
-  (
-    { id, title, children }: { id: string; title: string; children: ReactNode },
-    ref: any
-  ) => {
-    const isExpandableSection = id === 'experiencia' || id === 'proyectos';
-    return (
-      <section
-        id={id}
-        ref={ref}
-        className="cv-section bg-white dark:bg-slate-900/60 p-4 sm:p-6 md:p-8 rounded-2xl shadow-xl mb-12 transform hover:scale-[1.01] transition-transform duration-300"
-      >
-        <div className="flex items-center gap-4 mb-6 border-b pb-4 border-amber-600">
-          <h2 className="text-2xl sm:text-3xl font-bold text-[#4a688b] dark:text-[#93c5fd] font-sans">{title}</h2>
-          {isExpandableSection && (
-            <div className="flex items-center text-gray-500 dark:text-gray-300 ml-2">
-              <Info size={16} className="mr-1" />
-              <p className="text-sm font-medium">Presiona cada contenedor para desplegar información</p>
-            </div>
-          )}
-        </div>
-        {children}
-      </section>
-    );
-  }
-);
+const Section = forwardRef(({ id, title, children }: { id: string; title: string; children: ReactNode }, ref: any) => {
+  const isExpandableSection = id === 'experiencia' || id === 'proyectos';
+  return (
+    <section id={id} ref={ref} className="cv-section bg-white dark:bg-slate-900/60 p-4 sm:p-6 md:p-8 rounded-2xl shadow-xl mb-12 transform hover:scale-[1.01] transition-transform duration-300">
+      <div className="flex items-center gap-4 mb-6 border-b pb-4 border-amber-600">
+        <h2 className="text-2xl sm:text-3xl font-bold text-[#4a688b] dark:text-[#93c5fd] font-sans">{title}</h2>
+        {isExpandableSection && (
+          <div className="flex items-center text-gray-500 dark:text-gray-300 ml-2">
+            <Info size={16} className="mr-1" />
+            <p className="text-sm font-medium">Presiona cada contenedor para desplegar información</p>
+          </div>
+        )}
+      </div>
+      {children}
+    </section>
+  );
+});
 
 // ================== ITEM COLAPSABLE ==================
-const CollapsibleExperience = ({
-  date,
-  title,
-  company,
-  location,
-  description,
-  icon,
-}: {
-  date: string;
-  title: string;
-  company?: string;
-  location?: string;
-  description: string[];
-  icon: ReactNode;
+const CollapsibleExperience = ({ date, title, company, location, description, icon }: {
+  date: string; title: string; company?: string; location?: string; description: string[]; icon: ReactNode;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const contentRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if (contentRef.current) {
-      contentRef.current.style.maxHeight = isOpen ? `${contentRef.current.scrollHeight}px` : '0px';
-    }
+    if (contentRef.current) contentRef.current.style.maxHeight = isOpen ? `${contentRef.current.scrollHeight}px` : '0px';
   }, [isOpen]);
 
   return (
     <div className="cv-break bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden mb-4 border border-gray-200 dark:border-slate-700">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex justify-between items-center p-4 sm:p-6 text-left transition-colors duration-200 hover:bg-gray-50 dark:hover:bg-slate-700/40 focus:outline-none"
-      >
+      <button onClick={() => setIsOpen(!isOpen)} className="w-full flex justify-between items-center p-4 sm:p-6 text-left transition-colors duration-200 hover:bg-gray-50 dark:hover:bg-slate-700/40 focus:outline-none">
         <div className="flex items-start">
           <div className="mr-4 text-amber-600 flex-shrink-0">{icon}</div>
           <div>
@@ -489,26 +408,9 @@ const CollapsibleExperience = ({
             {location && <p className="text-sm text-gray-500 dark:text-gray-300">{location}</p>}
           </div>
         </div>
-        <svg
-          className={`w-6 h-6 transform transition-transform duration-300 text-[#4a688b] dark:text-slate-100 ${
-            isOpen ? 'rotate-180' : ''
-          }`}
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
+        <svg className={`w-6 h-6 transform transition-transform duration-300 text-[#4a688b] dark:text-slate-100 ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
       </button>
-
-      {/* contenido colapsable */}
-      <div
-        ref={contentRef}
-        data-collapsible-content="true"
-        className="overflow-hidden transition-[max-height] duration-500 ease-in-out"
-        style={{ maxHeight: '0px' }}
-      >
+      <div ref={contentRef} data-collapsible-content="true" className="overflow-hidden transition-[max-height] duration-500 ease-in-out" style={{ maxHeight: '0px' }}>
         <div className="px-6 pb-6 pt-2 border-t border-gray-200 dark:border-slate-700">
           <ul className="list-none space-y-2">
             {description.map((item, index) => (
@@ -524,7 +426,7 @@ const CollapsibleExperience = ({
   );
 };
 
-// ================== CARDS (…igual que antes) ==================
+// ====== Tarjetas (igual que tenías) ======
 const ProfileCard = ({ icon, text }: { icon: ReactNode; text: string }) => (
   <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 mb-4 border border-gray-200 dark:border-slate-700">
     <div className="flex items-start">
@@ -612,18 +514,14 @@ const ContactCard = ({ icon, label, value, href }: { icon: ReactNode; label: str
       </div>
     </div>
   );
-  return isLink ? (
-    <a href={href} className="block" target="_blank" rel="noopener noreferrer">{inner}</a>
-  ) : (
-    <div className="block cursor-default">{inner}</div>
-  );
+  return isLink ? <a href={href} className="block" target="_blank" rel="noopener noreferrer">{inner}</a> : <div className="block cursor-default">{inner}</div>;
 };
 // ================== APP ==================
 const App = () => {
   const [activeSection, setActiveSection] = useState('perfil');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Tema claro/oscuro (sin parpadeo)
+  // Tema claro/oscuro estable + sin parpadeo
   const getInitialDark = () => {
     try {
       const saved = localStorage.getItem('theme');
@@ -641,7 +539,7 @@ const App = () => {
     document.documentElement.classList.toggle('dark', isDark);
     try { localStorage.setItem('theme', isDark ? 'dark' : 'light'); } catch {}
   }, [isDark]);
-  const toggleDark = () => setIsDark(d => !d);
+  const toggleDark = () => setIsDark((d) => !d);
 
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
   const wrapperRef = useRef<HTMLDivElement | null>(null);
@@ -652,7 +550,6 @@ const App = () => {
     setIsMobileMenuOpen(false);
   };
 
-  // Activo en menú
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => entries.forEach((e) => e.isIntersecting && setActiveSection(e.target.id)),
@@ -662,18 +559,17 @@ const App = () => {
     return () => observer.disconnect();
   }, []);
 
-  // --- DESCARGA PDF (móvil con fallback de descarga, desktop con franja azul extendida) ---
+  // --- DESCARGA PDF con anclas seguras + fallback móvil ---
   const handleDownloadPDF = async () => {
     const root = wrapperRef.current;
     if (!root) return;
 
-    // Franja azul extendida SOLO desktop
     if (window.matchMedia('(min-width: 1024px)').matches) {
-      document.body.classList.add('capture-pdf');
+      document.body.classList.add('capture-pdf'); // franja azul extendida solo desktop
     }
 
-    // Expandir colapsables
     window.scrollTo(0, 0);
+
     const collapsibles = Array.from(root.querySelectorAll<HTMLElement>('[data-collapsible-content="true"]'));
     const prevHeights = collapsibles.map((el) => el.style.maxHeight);
     collapsibles.forEach((el) => { el.style.maxHeight = `${el.scrollHeight}px`; });
@@ -692,7 +588,6 @@ const App = () => {
       scrollY: -window.scrollY,
     });
 
-    // Paginado con anclas seguras
     const imgData = canvas.toDataURL('image/png');
     const pdf = new jsPDF('p', 'pt', 'a4');
     const pageWidth = pdf.internal.pageSize.getWidth();
@@ -700,12 +595,13 @@ const App = () => {
     const imgWidth = pageWidth;
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
+    // paginado por anclas seguras
     const pxToPdf = imgWidth / canvas.width;
     const pdfToPx = 1 / pxToPdf;
     const domPageHeight = pageHeight * pdfToPx;
 
-    const safeNodes = Array.from(root.querySelectorAll<HTMLElement>('.cv-section, .cv-break'));
     const rootRect = root.getBoundingClientRect();
+    const safeNodes = Array.from(root.querySelectorAll<HTMLElement>('.cv-section, .cv-break'));
     const tops = new Set<number>([0, canvas.height]);
     safeNodes.forEach(n => {
       const r = n.getBoundingClientRect();
@@ -735,7 +631,7 @@ const App = () => {
       pdf.addImage(imgData, 'PNG', 0, -startPx * pxToPdf, imgWidth, imgHeight);
     });
 
-    // Guardado: desktop .save(); móvil -> Blob fallback
+    // Guardado: desktop normal, móvil Blob fallback
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     if (isMobile) {
       const blob = pdf.output('blob');
@@ -746,57 +642,38 @@ const App = () => {
       a.download = 'CV_Areli_Aguilar.pdf';
       document.body.appendChild(a);
       a.click();
-      setTimeout(() => {
-        URL.revokeObjectURL(url);
-        a.remove();
-      }, 1200);
+      setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1200);
     } else {
       pdf.save('CV_Areli_Aguilar.pdf');
     }
 
-    // Restaurar
     collapsibles.forEach((el, i) => { el.style.maxHeight = prevHeights[i]; });
     document.body.classList.remove('capture-pdf');
   };
 
   return (
-    <div
-      ref={wrapperRef}
-      id="cv-container"
-      className="min-h-screen bg-gray-50 dark:bg-[#0b1220] font-sans antialiased text-gray-800 dark:text-gray-100"
-    >
+    <div ref={wrapperRef} id="cv-container" className="min-h-screen bg-gray-50 dark:bg-[#0b1220] font-sans antialiased text-gray-800 dark:text-gray-100">
       <style>{`
-      /* Cursor del tipeo */
-      .typing-cursor { display:inline-block; animation: blink-caret 0.75s step-end infinite; opacity:1; }
-      @keyframes blink-caret { from,to{opacity:0;} 50%{opacity:1;} }
+      .typing-cursor{display:inline-block;animation:blink-caret .75s step-end infinite;opacity:1}
+      @keyframes blink-caret{from,to{opacity:0}50%{opacity:1}}
 
-      /* Carrusel continuo sin huecos */
-      @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-      .marquee-container { display:flex; height:100%; width:max-content; animation:marquee 30s linear infinite; will-change:transform; }
-      .marquee-container.paused { animation-play-state: paused; }
-      .marquee-item { flex-shrink:0; display:flex; align-items:center; white-space:nowrap; padding:0 1.75rem; font-family:'Inter', sans-serif; font-size:1.1rem; font-weight:400; color:#4a688b; }
-      @media (max-width:1023px){ .marquee-item{ font-size:.95rem; padding:0 1rem; } }
-      .marquee-item .icon { color:#d97706; margin-right:.5rem; display:inline-block; vertical-align:middle; }
+      @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+      .marquee-container{display:flex;height:100%;width:max-content;animation:marquee 60s linear infinite;will-change:transform}
+      .marquee-container.paused{animation-play-state:paused}
+      .marquee-item{flex-shrink:0;display:flex;align-items:center;white-space:nowrap;padding:0 1.75rem;font-family:'Inter',sans-serif;font-size:1.1rem;font-weight:400;color:#4a688b}
+      @media (max-width:1023px){.marquee-item{font-size:.95rem;padding:0 1rem}}
+      .marquee-item .icon{color:#d97706;margin-right:.5rem;display:inline-block;vertical-align:middle}
 
-      /* Chips y tooltips */
-      .skill-chip{ background-color:#e5e7eb; color:#374151; border:1px solid #d1d5db; }
-      .dark .skill-chip{ background-color:#334155; color:#f8fafc; border-color:#475569; }
-      .dark .competencia-btn{ color:#fff !important; background-color:rgba(255,255,255,.08); }
-      .dark .competencia-btn:hover{ background-color:rgba(255,255,255,.16); }
+      .skill-chip{background-color:#e5e7eb;color:#374151;border:1px solid #d1d5db}
+      .dark .skill-chip{background-color:#334155;color:#f8fafc;border-color:#475569}
+      .dark .competencia-btn{color:#fff!important;background-color:rgba(255,255,255,.08)}
+      .dark .competencia-btn:hover{background-color:rgba(255,255,255,.16)}
+      .tooltip-content{background-color:#a8c0d9;color:#0f172a;border:1px solid #93a8c3}
+      .dark .tooltip-content{background-color:#475569;color:#fff;border:1px solid #94A3B8}
 
-      .tooltip-content{ background-color:#a8c0d9; color:#0f172a; border:1px solid #93a8c3; }
-      .dark .tooltip-content{ background-color:#475569; color:#fff; border:1px solid #94A3B8; }
-
-      /* Franja azul extendida SOLO durante la captura y SOLO en desktop */
       @media (min-width:1024px){
         .capture-pdf .app-nav::after{
-          content:"";
-          position:fixed;
-          left:0; top:0;
-          width:20rem; /* lg:w-80 */
-          height:20000px;
-          background:#1e2a38;
-          z-index:-1;
+          content:"";position:fixed;left:0;top:0;width:20rem;height:20000px;background:#1e2a38;z-index:-1
         }
       }
       `}</style>
@@ -820,14 +697,10 @@ const App = () => {
       </div>
 
       <main className="lg:ml-80 p-6 lg:p-8">
-        {/* Perfil */}
         <Section ref={(el) => (sectionRefs.current.perfil = el)} id="perfil" title="Perfil Profesional">
-          {portfolioData.profile.map((item, index) => (
-            <ProfileCard key={index} icon={item.icon} text={item.text} />
-          ))}
+          {portfolioData.profile.map((item, index) => (<ProfileCard key={index} icon={item.icon} text={item.text} />))}
         </Section>
 
-        {/* Habilidades */}
         <Section ref={(el) => (sectionRefs.current.habilidades = el)} id="habilidades" title="Habilidades Destacadas">
           <div className="space-y-6">
             <SkillsCard title="Experiencia Ejecutiva" icon={<Briefcase size={24} />} iconColor="#d97706">
@@ -868,21 +741,18 @@ const App = () => {
           </div>
         </Section>
 
-        {/* Experiencia */}
         <Section ref={(el) => (sectionRefs.current.experiencia = el)} id="experiencia" title="Experiencia Profesional">
           {portfolioData.experience.map((exp, index) => (
             <CollapsibleExperience key={index} date={exp.date} title={exp.title} company={exp.company} location={(exp as any).location} description={exp.description} icon={exp.icon} />
           ))}
         </Section>
 
-        {/* Proyectos */}
         <Section ref={(el) => (sectionRefs.current.proyectos = el)} id="proyectos" title="Proyectos de Innovación y Transformación Digital">
           {portfolioData.projects.map((project, index) => (
             <CollapsibleExperience key={index} date={project.date} title={project.title} description={project.description} icon={project.icon} />
           ))}
         </Section>
 
-        {/* Educación */}
         <Section ref={(el) => (sectionRefs.current.educacion = el)} id="educacion" title="Educación Académica">
           {portfolioData.education.map((edu, index) => (
             <EducationCard key={index} icon={edu.icon} iconColor={(edu as any).iconColor} title={edu.title} period={edu.period} description={edu.description} />
@@ -890,16 +760,12 @@ const App = () => {
           <OtherStudies items={portfolioData.otherStudies} />
         </Section>
 
-        {/* Idiomas */}
         <Section ref={(el) => (sectionRefs.current.idiomas = el)} id="idiomas" title="Idiomas">
           <div className="flex flex-col md:flex-row gap-4">
-            {portfolioData.languages.map((lang, index) => (
-              <LanguageCard key={index} language={lang.language} proficiency={lang.proficiency} />
-            ))}
+            {portfolioData.languages.map((lang, index) => (<LanguageCard key={index} language={lang.language} proficiency={lang.proficiency} />))}
           </div>
         </Section>
 
-        {/* Contacto */}
         <Section ref={(el) => (sectionRefs.current.contacto = el)} id="contacto" title="Contacto">
           <div className="grid md:grid-cols-2 gap-4">
             <ContactCard icon={<Mail size={24} />} label="Correo Electrónico" value={portfolioData.contact.email} href={`mailto:${portfolioData.contact.email}`} />
