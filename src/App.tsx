@@ -216,17 +216,24 @@ const MarqueeCarousel = () => {
     { text: 'Gestión de Proyectos', icon: <LayoutDashboard size={24} /> },
     { text: 'Análisis para la Toma de Decisiones', icon: <Gem size={24} /> },
   ];
-  const fullContent = [...phrases, ...phrases];
 
   return (
     <div
-      className="bg-transparent overflow-hidden h-12 w-full mt-4 marquee-container-wrapper flex items-center"
+      className="bg-transparent overflow-hidden h-12 w-full mt-6 marquee-container-wrapper flex items-center"
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
       <div className={`marquee-container ${isHovering ? 'paused' : ''}`}>
-        {fullContent.map((item, index) => (
-          <div key={index} className="marquee-item">
+        {/* Grupo 1 */}
+        {phrases.map((item, index) => (
+          <div key={`g1-${index}`} className="marquee-item">
+            <span className="icon">{item.icon}</span>
+            <span>{item.text}</span>
+          </div>
+        ))}
+        {/* Grupo 2 (idéntico) */}
+        {phrases.map((item, index) => (
+          <div key={`g2-${index}`} className="marquee-item">
             <span className="icon">{item.icon}</span>
             <span>{item.text}</span>
           </div>
@@ -404,7 +411,7 @@ const Section = forwardRef(
           {isExpandableSection && (
             <div className="flex items-center text-gray-500 dark:text-gray-300 ml-2">
               <Info size={16} className="mr-1" />
-              <p className="text-sm font-medium">Presiona para desplegar información</p>
+              <p className="text-sm font-medium">Presiona cada contenedor para desplegar información</p>
             </div>
           )}
         </div>
@@ -795,15 +802,40 @@ const App = () => {
       .typing-cursor { display:inline-block; animation: blink-caret 0.75s step-end infinite; opacity:1; }
       @keyframes blink-caret { from,to{opacity:0;} 50%{opacity:1;} }
 
-      /* Carrusel */
-      @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-100%); } }
-      .marquee-container { display:flex; height:100%; animation: marquee 60s linear infinite; }
+      /* Carrusel (loop continuo sin huecos, tipografía más sutil) */
+      @keyframes marquee {
+        from { transform: translateX(0); }
+        to   { transform: translateX(-50%); }
+      }
+      .marquee-container {
+        display: flex;
+        height: 100%;
+        width: max-content;
+        animation: marquee 60s linear infinite;
+        will-change: transform;
+      }
       .marquee-container.paused { animation-play-state: paused; }
-      .marquee-item { flex-shrink:0; display:flex; align-items:center; white-space:nowrap; padding:0 2rem; font-family:'Inter', sans-serif; font-size:1.25rem; font-weight:500; color:#4a688b; }
-      @media (max-width: 1023px) { .marquee-item { font-size:1rem; padding:0 1rem; } }
+
+      .marquee-item {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        white-space: nowrap;
+        padding: 0 1.75rem;
+        font-family: 'Inter', sans-serif;
+        font-size: 1.1rem;      /* más sutil */
+        font-weight: 400;       /* menos negritas */
+        color: #4a688b;
+      }
+      @media (max-width: 1023px) {
+        .marquee-item {
+          font-size: 0.95rem;
+          padding: 0 1rem;
+        }
+      }
       .marquee-item .icon { color:#d97706; margin-right:.5rem; display:inline-block; vertical-align:middle; }
 
-      /* Chips base para "Competencias" (contraste en claro/oscuro) */
+      /* Chips base para "Competencias" */
       .skill-chip{
         background-color:#e5e7eb;      /* gray-200 */
         color:#374151;                  /* gray-700 */
@@ -811,8 +843,8 @@ const App = () => {
       }
       .dark .skill-chip{
         background-color:#334155;       /* slate-700 */
-        color:#f8fafc;                  /* slate-50 */
-        border-color:#475569;           /* slate-600 */
+        color:#f8fafc;                   /* slate-50 */
+        border-color:#475569;            /* slate-600 */
       }
 
       /* Compatibilidad: mayor contraste en oscuro para chips marcados como competencia-btn */
@@ -820,11 +852,11 @@ const App = () => {
       .dark .competencia-btn { color: #fff !important; background-color: rgba(255,255,255,0.08); }
       .dark .competencia-btn:hover { background-color: rgba(255,255,255,0.16); }
 
-      /* Tooltip en modo oscuro */
+      /* Tooltip en modo oscuro — Opción 3 (gris azulado) */
       .dark .tooltip-content {
-        background-color: #0f172a;
-        color: #e5e7eb;
-        border: 1px solid #334155;
+        background-color: #475569;  /* slate-600 */
+        color: #ffffff;             /* texto blanco */
+        border: 1px solid #94A3B8;  /* slate-400 */
       }
       `}</style>
 
