@@ -324,27 +324,32 @@ const Navigation = ({
                 <span className="block">DELGADO</span>
               </h1>
 
-              {/* Botones: Modo y PDF */}
-              <div className="mt-4 flex items-center gap-3">
+              {/* Botones compactos y responsivos */}
+              <div className="mt-3 flex items-center gap-2">
+                {/* Toggle tema */}
                 <button
                   onClick={toggleDark}
-                  className="w-9 h-9 rounded-full border border-white/30 flex items-center justify-center hover:bg-white/10 transition"
+                  className="w-8 h-8 lg:w-9 lg:h-9 rounded-full border border-white/30 flex items-center justify-center hover:bg-white/10 transition"
                   aria-label="Alternar modo"
                   title={isDark ? 'Modo claro' : 'Modo oscuro'}
                 >
                   {isDark ? <Sun size={18} /> : <Moon size={18} />}
                 </button>
 
-                {/* Botón con texto: Descargar CV */}
-                <button
-                  onClick={onDownloadPDF}
-                  className="px-3 h-9 rounded-full border border-white/30 flex items-center gap-2 hover:bg-white/10 transition text-gray-100"
-                  aria-label="Descargar CV"
-                  title="Descargar CV"
-                >
-                  <Download size={16} />
-                  <span className="text-sm font-medium">Descargar CV</span>
-                </button>
+                {/* Descargar (solo icono) + tooltip al hover en desktop */}
+                <div className="relative group">
+                  <button
+                    onClick={onDownloadPDF}
+                    className="w-8 h-8 lg:w-9 lg:h-9 rounded-full border border-white/30 flex items-center justify-center hover:bg-white/10 transition"
+                    aria-label="Descargar CV"
+                    title="Descargar CV"
+                  >
+                    <Download size={18} />
+                  </button>
+                  <span className="hidden lg:block pointer-events-none absolute left-1/2 -translate-x-1/2 top-full mt-1 opacity-0 group-hover:opacity-100 transition bg-white/90 text-[#1e2a38] dark:bg-slate-700 dark:text-white text-xs font-medium px-2 py-1 rounded shadow">
+                    Descargar CV
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -691,14 +696,14 @@ const App = () => {
     return () => observer.disconnect();
   }, []);
 
-  // PDF: no cortar dentro de tarjetas/ítems y barra azul hasta el final
+  // PDF: cortes en anclas seguras + barra azul hasta el final
   const handleDownloadPDF = async () => {
     const root = wrapperRef.current;
     if (!root) return;
 
     document.body.classList.add('capture-pdf');
 
-    // Forzar barra azul a cubrir TODO: posición absoluta + gran altura
+    // Estirar barra azul (nav) para garantizar cobertura hasta Contacto
     const navEl = root.querySelector('.app-nav') as HTMLElement | null;
     const prevNav = navEl
       ? {
@@ -759,7 +764,7 @@ const App = () => {
     const pdfToPx = 1 / pxToPdf;
     const domPageHeight = pageHeight * pdfToPx;
 
-    // Anclas seguras (secciones + tarjetas/ítems)
+    // Anclas seguras (secciones y tarjetas/ítems)
     const rootRect = root.getBoundingClientRect();
     const safeNodes = Array.from(root.querySelectorAll<HTMLElement>('.cv-section, .cv-break'));
     const safeTopsSet = new Set<number>([0, canvas.height]);
@@ -770,26 +775,33 @@ const App = () => {
     });
     const safeTops = Array.from(safeTopsSet).sort((a, b) => a - b);
 
-    // Paginación por "final de página" (end-aligned)
-    const pageEndsPx: number[] = [];
-    let currentEnd = domPageHeight; // primera página aprox. una hoja
+    // Paginación por INICIOS seguros + última página forzada
+    const pageStartsPx: number[] = [0];
     const margin = 24;
     const minAdvance = 120;
 
-    while (currentEnd < canvas.height + 1) {
-      const limit = currentEnd - margin;
-      // Tomar el mayor "safeTop" <= limit
-      const candidates = safeTops.filter(v => v <= limit && v >= (pageEndsPx[pageEndsPx.length - 1] || 0) + minAdvance);
-      const endPx = candidates.length ? candidates[candidates.length - 1] : Math.max(0, Math.round(limit));
-      pageEndsPx.push(endPx);
+    while (true) {
+      const lastStart = pageStartsPx[pageStartsPx.length - 1];
+      const limit = lastStart + domPageHeight - margin;
 
-      if (endPx >= canvas.height) break; // llegamos al final
-      currentEnd = endPx + domPageHeight;
+      if (limit >= canvas.height) break;
+
+      // mayor safeTop <= limit y > lastStart + minAdvance
+      const candidates = safeTops.filter(v => v <= limit && v > lastStart + minAdvance);
+      const nextStart = candidates.length ? candidates[candidates.length - 1] : Math.min(limit, canvas.height);
+      if (nextStart <= lastStart + 1) break;
+
+      pageStartsPx.push(nextStart);
     }
 
-    // Pintar páginas usando los "finales" calculados
-    pageEndsPx.forEach((endPx, idx) => {
-      const startPx = Math.max(0, Math.round(endPx - domPageHeight)); // región [start, end]
+    // Si aún queda contenido sin cubrir, fuerza última página
+    const lastStartNeeded = canvas.height - domPageHeight;
+    if (lastStartNeeded > pageStartsPx[pageStartsPx.length - 1] + minAdvance) {
+      pageStartsPx.push(Math.max(0, Math.round(lastStartNeeded)));
+    }
+
+    // Pintar páginas
+    pageStartsPx.forEach((startPx, idx) => {
       if (idx > 0) pdf.addPage();
       const yPdf = -startPx * pxToPdf;
       pdf.addImage(imgData, 'PNG', 0, yPdf, imgWidth, imgHeight);
@@ -859,17 +871,17 @@ const App = () => {
       .dark .competencia-btn { color: #fff !important; background-color: rgba(255,255,255,0.08); }
       .dark .competencia-btn:hover { background-color: rgba(255,255,255,0.16); }
 
-      /* Tooltip en modo claro — fondo azul suave y texto legible */
+      /* Tooltip modo claro: azul suave original (legible) */
       .tooltip-content {
-        background-color: #a8c0d9; /* azul suave original */
-        color: #0f172a;            /* contraste alto */
-        border: 1px solid #93a8c3; /* borde sutil */
+        background-color: #a8c0d9;
+        color: #0f172a;
+        border: 1px solid #93a8c3;
       }
-      /* Tooltip en modo oscuro — Opción 3 (gris azulado) */
+      /* Tooltip modo oscuro — opción 3 (gris azulado) */
       .dark .tooltip-content {
-        background-color: #475569;  /* slate-600 */
+        background-color: #475569;
         color: #ffffff;
-        border: 1px solid #94A3B8;  /* slate-400 */
+        border: 1px solid #94A3B8;
       }
       `}</style>
 
