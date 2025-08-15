@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, forwardRef, ReactNode } from 'react';
 import {
   User, Briefcase, GraduationCap, Globe, Zap, Brain, Landmark, FileText, HardHat, Users,
   BarChart, Gem, Lightbulb, Info, Settings, Bot, Handshake, BookOpen, Flag, LayoutDashboard,
@@ -6,6 +6,17 @@ import {
 } from 'lucide-react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+
+// === Bootstrap de tema (aplica "dark" antes del 1er render) ===
+(() => {
+  try {
+    const saved = localStorage.getItem('theme');
+    const isDark = saved ? saved === 'dark' : false;
+    const root = document.documentElement;
+    if (isDark) root.classList.add('dark');
+    else root.classList.remove('dark');
+  } catch {}
+})();
 
 // ================== DATA ==================
 const portfolioData = {
@@ -227,7 +238,7 @@ const TypingEffect = ({ text }: { text: string }) => {
   const [speed, setSpeed] = useState(100);
 
   useEffect(() => {
-    const handleTyping = () => {
+    const tick = () => {
       if (!isDeleting) {
         if (displayedText.length < text.length) {
           setDisplayedText(text.substring(0, displayedText.length + 1));
@@ -246,7 +257,7 @@ const TypingEffect = ({ text }: { text: string }) => {
         }
       }
     };
-    const t = setTimeout(handleTyping, speed);
+    const t = setTimeout(tick, speed);
     return () => clearTimeout(t);
   }, [displayedText, isDeleting, speed, text]);
 
@@ -371,8 +382,11 @@ const Navigation = ({
 };
 
 // ================== SECCIÓN GENÉRICA ==================
-const Section = React.forwardRef(
-  ({ id, title, children }: { id: string; title: string; children: React.ReactNode }, ref: any) => {
+const Section = forwardRef(
+  (
+    { id, title, children }: { id: string; title: string; children: ReactNode },
+    ref: any
+  ) => {
     const isExpandableSection = id === 'experiencia' || id === 'proyectos';
     return (
       <section
@@ -409,7 +423,7 @@ const CollapsibleExperience = ({
   company?: string;
   location?: string;
   description: string[];
-  icon: React.ReactNode;
+  icon: ReactNode;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const contentRef = useRef<HTMLDivElement | null>(null);
@@ -471,7 +485,7 @@ const CollapsibleExperience = ({
 };
 
 // ================== CARDS ==================
-const ProfileCard = ({ icon, text }: { icon: React.ReactNode; text: string }) => (
+const ProfileCard = ({ icon, text }: { icon: ReactNode; text: string }) => (
   <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 mb-4 border border-gray-200 dark:border-slate-700">
     <div className="flex items-start">
       <div className="mr-4 text-[#4a688b] dark:text-[#93c5fd] mt-1 flex-shrink-0">{icon}</div>
@@ -487,7 +501,7 @@ const EducationCard = ({
   period,
   description,
 }: {
-  icon: React.ReactNode;
+  icon: ReactNode;
   iconColor: string;
   title: string;
   period: string;
@@ -551,9 +565,9 @@ const SkillsCard = ({
   children,
 }: {
   title: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
   iconColor: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }) => (
   <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 mb-4 border border-gray-200 dark:border-slate-700">
     <div className="flex items-center mb-4">
@@ -572,7 +586,7 @@ const ContactCard = ({
   value,
   href,
 }: {
-  icon: React.ReactNode;
+  icon: ReactNode;
   label: string;
   value: string;
   href?: string;
