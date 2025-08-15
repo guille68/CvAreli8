@@ -609,7 +609,7 @@ const ContactCard = ({
           <div>
             <p className="text-sm font-semibold text-gray-500 dark:text-gray-300">{label}</p>
             <p className="text-lg font-bold text-[#4a688b] dark:text-slate-100 break-words">{value}</p>
-            {/* Eliminado: impresión redundante del href para evitar duplicados en PDF/HTML */}
+            {/* Eliminado el href visible para evitar duplicados */}
           </div>
         </div>
         {isLink && (
@@ -646,7 +646,7 @@ const App = () => {
   };
   const [isDark, setIsDark] = useState<boolean>(getInitialDark());
 
-  // Patch A: aplicar 'dark' antes del primer pintado
+  // Aplicar 'dark' antes del primer pintado (evita parpadeo y asegura activación)
   useLayoutEffect(() => {
     const saved = (() => {
       try { return localStorage.getItem('theme'); } catch { return null; }
@@ -684,22 +684,53 @@ const App = () => {
     return () => observer.disconnect();
   }, []);
 
-  // PDF: expande colapsables, ajusta nav y restaura; multipágina
+  // PDF: expande colapsables, pinta lateral azul completo, multipágina y restaura
   const handleDownloadPDF = async () => {
     const root = wrapperRef.current;
     if (!root) return;
 
     window.scrollTo(0, 0);
 
-    // --- Patch B: extender lateral azul durante la captura ---
+    // --- Patch B2: extender lateral azul durante la captura (altura total robusta) ---
     const navEl = root.querySelector('.app-nav') as HTMLElement | null;
     const prevNav = navEl
-      ? { position: navEl.style.position, height: navEl.style.height, top: navEl.style.top }
+      ? {
+          position: navEl.style.position,
+          height: navEl.style.height,
+          top: navEl.style.top,
+          left: navEl.style.left,
+          zIndex: navEl.style.zIndex,
+        }
       : null;
+
+    const totalHeight = Math.max(
+      document.documentElement.scrollHeight,
+      document.documentElement.offsetHeight,
+      document.body ? document.body.scrollHeight : 0,
+      document.body ? document.body.offsetHeight : 0,
+      root.scrollHeight,
+      root.offsetHeight
+    );
+
+    let navOverlay: HTMLDivElement | null = null;
+
     if (navEl) {
       navEl.style.position = 'absolute';
       navEl.style.top = '0';
-      navEl.style.height = `${root.scrollHeight}px`;
+      navEl.style.left = '0';
+      navEl.style.height = `${totalHeight}px`;
+      navEl.style.zIndex = '50';
+
+      navOverlay = document.createElement('div');
+      const navRect = navEl.getBoundingClientRect();
+      navOverlay.style.position = 'absolute';
+      navOverlay.style.top = '0';
+      navOverlay.style.left = '0';
+      navOverlay.style.width = `${navRect.width || navEl.offsetWidth || 320}px`; // ~ w-80
+      navOverlay.style.height = `${totalHeight}px`;
+      navOverlay.style.backgroundColor = '#1e2a38';
+      navOverlay.style.zIndex = '49';
+      root.insertBefore(navOverlay, root.firstChild);
     }
 
     // Expande colapsables
@@ -739,7 +770,7 @@ const App = () => {
 
     while (heightLeft > 0) {
       pdf.addPage();
-      y -= pageHeight; // desplazar la imagen hacia arriba por cada página
+      y -= pageHeight;
       pdf.addImage(imgData, 'PNG', 0, y, imgWidth, imgHeight);
       heightLeft -= pageHeight;
     }
@@ -751,11 +782,17 @@ const App = () => {
       el.style.maxHeight = prevHeights[i];
     });
 
-    // Restaurar nav
+    // Restaurar nav y limpiar overlay
+    if (navOverlay && navOverlay.parentNode) {
+      navOverlay.parentNode.removeChild(navOverlay);
+      navOverlay = null;
+    }
     if (navEl && prevNav) {
       navEl.style.position = prevNav.position;
       navEl.style.height = prevNav.height;
       navEl.style.top = prevNav.top;
+      navEl.style.left = prevNav.left;
+      navEl.style.zIndex = prevNav.zIndex;
     }
   };
 
@@ -793,16 +830,16 @@ const App = () => {
         border-color:#475569;          /* slate-600 */
       }
 
-      /* Compatibilidad: mayor contraste en oscuro para chips marcados como competencia-btn */
+      /* Contraste extra en oscuro para chips etiquetados como competencia-btn */
       .competencia-btn { }
       .dark .competencia-btn { color: #fff !important; background-color: rgba(255,255,255,0.08); }
       .dark .competencia-btn:hover { background-color: rgba(255,255,255,0.16); }
 
       /* Tooltip en modo oscuro */
       .dark .tooltip-content {
-        background-color: #0f172a;    /* slate-900 */
-        color: #e5e7eb;               /* gray-200 */
-        border: 1px solid #334155;    /* slate-700 */
+        background-color: #0f172a;
+        color: #e5e7eb;
+        border: 1px solid #334155;
       }
       `}</style>
 
