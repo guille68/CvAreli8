@@ -163,7 +163,7 @@ const portfolioData = {
       period: '2024-2025',
       description: [
         'Programa Intensivo de Transformación Digital',
-        'Especialización en Inteligencia Artificial Aplicada enfocado en implementación de soluciones inteligentes, optimización de procesos empresariales y aplicación práctica de tecnologías emergentes en entornos corporativos.',
+        'Especialización en Inteligencia Artificial Aplicada enfocada en implementación de soluciones inteligentes, optimización de procesos empresariales y aplicación práctica de tecnologías emergentes en entornos corporativos.',
       ],
     },
     {
@@ -336,13 +336,16 @@ const Navigation = ({
                 >
                   {isDark ? <Sun size={18} /> : <Moon size={18} />}
                 </button>
+
+                {/* Botón discreto con texto */}
                 <button
                   onClick={onDownloadPDF}
-                  className="w-9 h-9 rounded-full border border-white/30 flex items-center justify-center hover:bg-white/10 transition"
-                  aria-label="Descargar PDF"
-                  title="Descargar PDF"
+                  className="px-3 h-9 rounded-full border border-white/30 flex items-center gap-2 hover:bg-white/10 transition text-gray-100"
+                  aria-label="Descargar CV"
+                  title="Descargar CV"
                 >
-                  <Download size={18} />
+                  <Download size={16} />
+                  <span className="text-sm font-medium">Descargar CV</span>
                 </button>
               </div>
             </div>
@@ -404,7 +407,7 @@ const Section = forwardRef(
       <section
         id={id}
         ref={ref}
-        className="bg-white dark:bg-slate-900/60 p-4 sm:p-6 md:p-8 rounded-2xl shadow-xl mb-12 transform hover:scale-[1.01] transition-transform duration-300"
+        className="cv-section bg-white dark:bg-slate-900/60 p-4 sm:p-6 md:p-8 rounded-2xl shadow-xl mb-12 transform hover:scale-[1.01] transition-transform duration-300"
       >
         <div className="flex items-center gap-4 mb-6 border-b pb-4 border-amber-600">
           <h2 className="text-2xl sm:text-3xl font-bold text-[#4a688b] dark:text-[#93c5fd] font-sans">{title}</h2>
@@ -616,7 +619,6 @@ const ContactCard = ({
           <div>
             <p className="text-sm font-semibold text-gray-500 dark:text-gray-300">{label}</p>
             <p className="text-lg font-bold text-[#4a688b] dark:text-slate-100 break-words">{value}</p>
-            {/* evitamos imprimir el href para que no se duplique texto */}
           </div>
         </div>
         {isLink && (
@@ -653,7 +655,7 @@ const App = () => {
   };
   const [isDark, setIsDark] = useState<boolean>(getInitialDark());
 
-  // Aplicar 'dark' antes del primer pintado (evita parpadeo y asegura activación)
+  // Aplicar 'dark' antes del primer pintado (evita parpadeo)
   useLayoutEffect(() => {
     const saved = (() => {
       try { return localStorage.getItem('theme'); } catch { return null; }
@@ -691,15 +693,15 @@ const App = () => {
     return () => observer.disconnect();
   }, []);
 
-  // PDF: expande colapsables, estira lateral azul (captura) y restaura
+  // PDF: expandir colapsables, estirar lateral azul, y cortar en límites de sección
   const handleDownloadPDF = async () => {
     const root = wrapperRef.current;
     if (!root) return;
 
-    // Modo captura activado (index.css ajusta .app-nav)
+    // 1) Activar modo captura (index.css ajusta .app-nav)
     document.body.classList.add('capture-pdf');
 
-    // Backup y estirado extra del nav (robusto para html2canvas)
+    // Estirar lateral azul hasta el final
     const navEl = root.querySelector('.app-nav') as HTMLElement | null;
     const prevNav = navEl
       ? {
@@ -719,25 +721,19 @@ const App = () => {
       root.scrollHeight,
       root.offsetHeight
     );
-    if (navEl) {
-      // aunque .capture-pdf lo pone en absolute, forzamos la altura real por seguridad
-      navEl.style.height = `${totalHeight}px`;
-    }
+    if (navEl) navEl.style.height = `${totalHeight}px`;
 
-    // Ir al tope
+    // 2) Ir al tope y expandir colapsables
     window.scrollTo(0, 0);
-
-    // Expandir colapsables
     const collapsibles = Array.from(
       root.querySelectorAll<HTMLElement>('[data-collapsible-content="true"]')
     );
     const prevHeights = collapsibles.map((el) => el.style.maxHeight);
     collapsibles.forEach((el) => { el.style.maxHeight = `${el.scrollHeight}px`; });
 
-    // Dejar que el layout se asiente
     await new Promise((r) => setTimeout(r, 250));
 
-    // Captura
+    // 3) Captura
     const bg = getComputedStyle(root).backgroundColor || (isDark ? '#0b1220' : '#ffffff');
     const canvas = await html2canvas(root, {
       scale: 2,
@@ -750,34 +746,50 @@ const App = () => {
       scrollY: -window.scrollY,
     });
 
-    // PDF multipágina
+    // 4) PDF
     const imgData = canvas.toDataURL('image/png');
     const pdf = new jsPDF('p', 'pt', 'a4');
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
-
     const imgWidth = pageWidth;
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-    let heightLeft = imgHeight;
-    let y = 0;
+    // Conversión DOMpx <-> PDFpt
+    const pxToPdf = imgWidth / canvas.width;
+    const pdfToPx = 1 / pxToPdf;
+    const domPageHeight = pageHeight * pdfToPx;
 
-    pdf.addImage(imgData, 'PNG', 0, y, imgWidth, imgHeight);
-    heightLeft -= pageHeight;
+    // 5) Cortes seguros: inicios de cada .cv-section
+    const rootRect = root.getBoundingClientRect();
+    const sections = Array.from(root.querySelectorAll<HTMLElement>('.cv-section'));
+    const safeTops = [0, ...sections.map(s =>
+      (s.getBoundingClientRect().top - rootRect.top + window.scrollY)
+    )].sort((a,b) => a - b);
 
-    while (heightLeft > 0) {
-      pdf.addPage();
-      y -= pageHeight;
-      pdf.addImage(imgData, 'PNG', 0, y, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
+    const pageStartsPx: number[] = [];
+    let currentStart = 0;
+    const margin = 24; // amortiguador
+
+    while (currentStart < canvas.height - 1) {
+      const limit = currentStart + domPageHeight - margin;
+      const candidates = safeTops.filter(v => v > currentStart + margin && v <= limit);
+      const nextStart = candidates.length ? candidates[candidates.length - 1] : Math.min(limit, canvas.height);
+      pageStartsPx.push(currentStart);
+      if (nextStart <= currentStart + 1) break;
+      currentStart = nextStart;
     }
+
+    // 6) Añadir páginas respetando los cortes
+    pageStartsPx.forEach((startPx, idx) => {
+      if (idx > 0) pdf.addPage();
+      const yPdf = -startPx * pxToPdf;
+      pdf.addImage(imgData, 'PNG', 0, yPdf, imgWidth, imgHeight);
+    });
 
     pdf.save('CV_Areli_Aguilar.pdf');
 
-    // Restaurar colapsables
+    // 7) Restaurar
     collapsibles.forEach((el, i) => { el.style.maxHeight = prevHeights[i]; });
-
-    // Restaurar nav y salir de modo captura
     if (navEl && prevNav) {
       navEl.style.position = prevNav.position;
       navEl.style.height = prevNav.height;
@@ -795,9 +807,6 @@ const App = () => {
       className="min-h-screen bg-gray-50 dark:bg-[#0b1220] font-sans antialiased text-gray-800 dark:text-gray-100"
     >
       <style>{`
-      /* Nombre estático */
-      .static-name, .static-name span { animation: none !important; }
-
       /* Cursor del tipeo */
       .typing-cursor { display:inline-block; animation: blink-caret 0.75s step-end infinite; opacity:1; }
       @keyframes blink-caret { from,to{opacity:0;} 50%{opacity:1;} }
@@ -811,7 +820,7 @@ const App = () => {
         display: flex;
         height: 100%;
         width: max-content;
-        animation: marquee 23s linear infinite;
+        animation: marquee 60s linear infinite; /* acelera reduciendo este valor, ej. 48s */
         will-change: transform;
       }
       .marquee-container.paused { animation-play-state: paused; }
@@ -823,29 +832,18 @@ const App = () => {
         white-space: nowrap;
         padding: 0 1.75rem;
         font-family: 'Inter', sans-serif;
-        font-size: 1.1rem;      /* más sutil */
-        font-weight: 400;       /* menos negritas */
+        font-size: 1.1rem;
+        font-weight: 400;
         color: #4a688b;
       }
       @media (max-width: 1023px) {
-        .marquee-item {
-          font-size: 0.95rem;
-          padding: 0 1rem;
-        }
+        .marquee-item { font-size: 0.95rem; padding: 0 1rem; }
       }
       .marquee-item .icon { color:#d97706; margin-right:.5rem; display:inline-block; vertical-align:middle; }
 
-      /* Chips base para "Competencias" */
-      .skill-chip{
-        background-color:#e5e7eb;      /* gray-200 */
-        color:#374151;                  /* gray-700 */
-        border:1px solid #d1d5db;       /* gray-300 */
-      }
-      .dark .skill-chip{
-        background-color:#334155;       /* slate-700 */
-        color:#f8fafc;                   /* slate-50 */
-        border-color:#475569;            /* slate-600 */
-      }
+      /* Chips base */
+      .skill-chip{ background-color:#e5e7eb; color:#374151; border:1px solid #d1d5db; }
+      .dark .skill-chip{ background-color:#334155; color:#f8fafc; border-color:#475569; }
 
       /* Compatibilidad: mayor contraste en oscuro para chips marcados como competencia-btn */
       .competencia-btn { }
@@ -855,7 +853,7 @@ const App = () => {
       /* Tooltip en modo oscuro — Opción 3 (gris azulado) */
       .dark .tooltip-content {
         background-color: #475569;  /* slate-600 */
-        color: #ffffff;             /* texto blanco */
+        color: #ffffff;
         border: 1px solid #94A3B8;  /* slate-400 */
       }
       `}</style>
@@ -891,8 +889,7 @@ const App = () => {
           <div className="space-y-6">
             <SkillsCard title="Experiencia Ejecutiva" icon={<Briefcase size={24} />} iconColor="#d97706">
               <p className="text-gray-700 dark:text-gray-200">
-                Más de 15 años de experiencia realizando gestiones administrativas clave a nivel ejecutivo para la alta
-                dirección.
+                Más de 15 años de experiencia realizando gestiones administrativas clave a nivel ejecutivo para la alta dirección.
               </p>
             </SkillsCard>
 
@@ -918,7 +915,7 @@ const App = () => {
                       {label}
                       <Info size={12} className="inline-block ml-1 opacity-60 group-hover:opacity-100 transition-opacity" />
                     </span>
-                    <div className="tooltip-content absolute z-10 hidden group-hover:block bg-[#a8c0d9] text-gray-900 font-medium text-xs p-3 shadow-xl rounded-md w-64 top-full mt-1 left-1/2 -translate-x-1/2">
+                    <div className="tooltip-content absolute z-10 hidden group-hover:block font-medium text-xs p-3 shadow-xl rounded-md w-64 top-full mt-1 left-1/2 -translate-x-1/2">
                       {tooltip}
                     </div>
                   </div>
@@ -928,8 +925,7 @@ const App = () => {
 
             <SkillsCard title="Enfoque de Colaboración" icon={<HeartHandshake size={24} />} iconColor="#d97706">
               <p className="text-gray-700 dark:text-gray-200">
-                Habilidades destacadas para generar confianza, facilitar la cooperación y fomentar un ambiente de alto
-                rendimiento.
+                Habilidades destacadas para generar confianza, facilitar la cooperación y fomentar un ambiente de alto rendimiento.
               </p>
             </SkillsCard>
           </div>
