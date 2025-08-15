@@ -10,10 +10,26 @@ import html2canvas from 'html2canvas';
 // ================== DATA ==================
 const portfolioData = {
   profile: [
-    { icon: <Briefcase size={24} />, text: 'Ejecutiva bilingüe (inglés/español) con más de 20 años de experiencia en desarrollo de negocios, gestión estratégica de proyectos y análisis de información clave para la toma de decisiones de alta dirección.' },
-    { icon: <Settings size={24} />, text: 'Mi trayectoria combina habilidades avanzadas en planeación y gestión administrativa con una visión estratégica orientada a la transformación digital. Integro tecnologías emergentes - incluida la inteligencia artificial- para modernizar procesos, fortalecer la gestión empresarial y optimizar la toma de decisiones, impulsando la eficiencia operativa y la identificación de oportunidades estratégicas.' },
-    { icon: <Bot size={24} />, text: 'Actualmente participo en equipos interdisciplinarios que aplican inteligencia artificial en entornos empresariales, desarrollando soluciones innovadoras con impacto tangible en la organización.' },
-    { icon: <Handshake size={24} />, text: 'Cuento con amplia experiencia generando relaciones comerciales estratégicas entre organizaciones privadas y públicas, mediante propuestas alineadas con objetivos corporativos. Me distingo por mi capacidad para identificar necesidades del cliente, gestionar ventas de forma estructurada y construir vínculos institucionales sólidos. Tengo una orientación constante a resultados y un firme compromiso con el cumplimiento de metas organizacionales.' },
+    {
+      icon: <Briefcase size={24} />,
+      text:
+        'Ejecutiva bilingüe (inglés/español) con más de 20 años de experiencia en desarrollo de negocios, gestión estratégica de proyectos y análisis de información clave para la toma de decisiones de alta dirección.',
+    },
+    {
+      icon: <Settings size={24} />,
+      text:
+        'Mi trayectoria combina habilidades avanzadas en planeación y gestión administrativa con una visión estratégica orientada a la transformación digital. Integro tecnologías emergentes - incluida la inteligencia artificial- para modernizar procesos, fortalecer la gestión empresarial y optimizar la toma de decisiones, impulsando la eficiencia operativa y la identificación de oportunidades estratégicas.',
+    },
+    {
+      icon: <Bot size={24} />,
+      text:
+        'Actualmente participo en equipos interdisciplinarios que aplican inteligencia artificial en entornos empresariales, desarrollando soluciones innovadoras con impacto tangible en la organización.',
+    },
+    {
+      icon: <Handshake size={24} />,
+      text:
+        'Cuento con amplia experiencia generando relaciones comerciales estratégicas entre organizaciones privadas y públicas, mediante propuestas alineadas con objetivos corporativos. Me distingo por mi capacidad para identificar necesidades del cliente, gestionar ventas de forma estructurada y construir vínculos institucionales sólidos. Tengo una orientación constante a resultados y un firme compromiso con el cumplimiento de metas organizacionales.',
+    },
   ],
   skills: {
     tooltips: {
@@ -73,7 +89,7 @@ const portfolioData = {
       description: [
         'Colaboré en el desarrollo de la estrategia comercial para el mercado de telefonía celular prepagada de la empresa AT&T.',
         'Identifiqué oportunidades de negocio para proyectos de infraestructura y fungí como enlace entre el gobierno y las empresas de construcción.',
-        'Consolidé y gestioné el arrendamiento de cuatro propiedades residenciales...',
+        'Consolidé y gestioné el arrendamiento de cuatro propiedades residenciales, lo cual incluyó la búsqueda de posibles clientes, la promoción a través de sitios web especializados y redes sociales, la negociación, así como la revisión de evaluaciones legales y contratos con firmas de abogados.',
       ],
       icon: <FileText size={24} />,
     },
@@ -87,7 +103,9 @@ const portfolioData = {
         'Establecí sólidas redes institucionales para identificar valiosas oportunidades comerciales.',
         'Pronostiqué oportunidades de negocio, gestioné clientes potenciales y cerré exitosamente proyectos.',
         'Encargada de la prospección, desarrollo e implementación de proyectos de infraestructura en colaboración con el gobierno.',
-        'Brindé apoyo y coordiné diversas áreas...',
+        'Brindé apoyo y coordiné diversas áreas, desempeñando funciones administrativas y de gestión de proyectos (ventas, cartera, legal, calidad, planta, supervisión de obra, licitaciones, entre otros).',
+        'Logré el exitoso cierre de un proyecto para pavimentar 25 calles en el centro de la Ciudad de México, en la Zona Rosa (USD $35M).',
+        'Responsable de la generación de informes para la alta dirección.',
       ],
       icon: <HardHat size={24} />,
     },
@@ -96,11 +114,12 @@ const portfolioData = {
       title: 'Especialista Senior en Información y Enlace - Relaciones Institucionales',
       company: 'Cementos Mexicanos - CEMEX',
       description: [
-        'Área nueva: estructuración e implementación de procesos.',
-        'Supervisión de indicadores para planificación estratégica.',
-        'Gestión integral de información y soporte a procesos operativos y administrativos.',
-        'Participación en selección de proyectos y empresas a atender.',
-        'Organización de información para proyecto de pavimentación (USD $105M).',
+        'Al tratarse de un área nueva, desempeñé un papel fundamental en la estructuración e implementación de procesos administrativos alineados con las políticas de la empresa.',
+        'Supervisé indicadores clave para facilitar la planificación estratégica, diseñar estrategias comerciales y apoyar la toma de decisiones.',
+        'Encargada de la gestión integral y consolidación de información.',
+        'Brindé respaldo a procesos operativos y administrativos, incluyendo la elaboración y seguimiento de presupuestos, generación de informes mensuales de resultados, preparación de presentaciones institucionales, coordinación de entregas, seguimiento de pedidos, entre otros.',
+        'Participé activamente en el análisis para seleccionar proyectos y empresas a atender en esta área, en conformidad con las políticas de la empresa.',
+        'Contribuí a la organización de información crucial para un proyecto de pavimentación en una de las avenidas más importantes de la Ciudad de México (USD $105M).',
       ],
       icon: <Users size={24} />,
     },
@@ -109,13 +128,13 @@ const portfolioData = {
       title: 'Jefatura de Soporte Operativo - Ventas Institucionales',
       company: 'Cementos Mexicanos - CEMEX',
       description: [
-        'Centralización de información de ventas a nivel nacional.',
-        'Análisis de términos comerciales por cliente.',
-        'Implementación de estrategias administrativas y soporte a operaciones.',
-        'Establecimiento de controles e indicadores clave.',
-        'Recuperación del 40% de cartera incobrable.',
-        'Liderazgo en implementación de ERP a nivel nacional.',
-        'Gestión de estrategia de precios mediante cotizaciones y negociaciones internas.',
+        'Encargada de centralizar la información de ventas a nivel nacional para clientes del sector de construcción y transformadores.',
+        'Participé activamente en el análisis de términos comerciales aplicables a cada cliente del ámbito de construcción y transformación.',
+        'Responsable de implementar estrategias administrativas y brindar respaldo a las tareas operativas.',
+        'Coordiné el establecimiento de controles e indicadores fundamentales para empresas del sector de construcción.',
+        'Contribuí al éxito en la recuperación del 40% de la cartera incobrable.',
+        'Encargada de liderar la implementación de un sistema ERP (Planificación de Recursos Empresariales) a nivel nacional para el segmento institucional.',
+        'Gestioné eficazmente la estrategia de precios mediante cotizaciones y negociaciones internas específicas, tales como establecer precios por volumen, gestionar entregas, tipos de productos, entre otros.',
       ],
       icon: <BarChart size={24} />,
     },
@@ -125,24 +144,53 @@ const portfolioData = {
       title: 'AI STARS LEAGUE',
       date: 'Diciembre 2024 - Junio 2025',
       description: [
-        'Competencia internacional de alto rendimiento en IA aplicada.',
-        'Trabajo en equipos multidisciplinarios para resolver desafíos reales.',
-        'Soluciones con impacto empresarial (automatización, análisis, generación con IA).',
-        'Transformación digital, visualización de datos y mejora de procesos.',
-        'Evaluación por expertos internacionales y networking global.',
+        'Participación activa en una competencia internacional de alto rendimiento en inteligencia artificial aplicada.',
+        'Integré equipos multidisciplinarios para resolver desafíos reales mediante tecnologías de IA, combinando pensamiento estratégico, innovación y visión de negocio.',
+        'Diseñé y presenté soluciones con impacto empresarial, aplicando habilidades avanzadas en automatización, análisis de datos, generación de contenido con IA y desarrollo de herramientas inteligentes.',
+        'Colaboré en proyectos enfocados en transformación digital, visualización de datos y mejora de procesos organizacionales.',
+        'Fui evaluada por un panel de expertos internacionales en IA, innovación y consultoría estratégica.',
+        'La experiencia fortaleció mis competencias para integrar inteligencia artificial en contextos reales, potenciar la resolución creativa de problemas y acelerar la implementación de soluciones tecnológicas.',
+        'Participé en sesiones de capacitación técnica especializada y actividades de networking internacional con líderes y profesionales de alto nivel del ecosistema tecnológico global.',
       ],
       icon: <Brain size={24} />,
     },
   ],
   education: [
-    { icon: <Brain size={24} />, iconColor: '#8B5CF6', title: 'LEARNING HEROES', period: '2024-2025', description: ['Programa Intensivo de Transformación Digital', 'Especialización en IA Aplicada enfocada en implementación y optimización de procesos.'] },
-    { icon: <BookOpen size={24} />, iconColor: '#8B5CF6', title: 'Diplomado en Marketing Digital', period: '2022', description: 'ITAM' },
-    { icon: <Landmark size={24} />, iconColor: '#3B82F6', title: 'ITESM', period: '2002-2004', description: 'MBA' },
-    { icon: <Landmark size={24} />, iconColor: '#3B82F6', title: 'ITESM', period: '1991-1995', description: 'Licenciatura en Mercadotecnia (Mención Honorífica)' },
+    {
+      icon: <Brain size={24} />,
+      iconColor: '#8B5CF6',
+      title: 'LEARNING HEROES',
+      period: '2024-2025',
+      description: [
+        'Programa Intensivo de Transformación Digital',
+        'Especialización en Inteligencia Artificial Aplicada enfocado en implementación de soluciones inteligentes, optimización de procesos empresariales y aplicación práctica de tecnologías emergentes en entornos corporativos.',
+      ],
+    },
+    {
+      icon: <BookOpen size={24} />,
+      iconColor: '#8B5CF6',
+      title: 'Diplomado en Marketing Digital',
+      period: '2022',
+      description: 'ITAM',
+    },
+    {
+      icon: <Landmark size={24} />,
+      iconColor: '#3B82F6',
+      title: 'ITESM',
+      period: '2002-2004',
+      description: 'Master en Administración de Negocios (MBA)',
+    },
+    {
+      icon: <Landmark size={24} />,
+      iconColor: '#3B82F6',
+      title: 'ITESM',
+      period: '1991-1995',
+      description: 'Licenciatura en Mercadotecnia (Mención Honorífica)',
+    },
   ],
   otherStudies: [
     'Diploma en Gestión Estratégica de las Finanzas Públicas; ITESM; 2016-2017.',
-    'Diploma en Mercadotecnia Competitiva; WTC; 1997-1998.',
+    'Diploma en Mercadotecnia Competitiva; World Trade Center, Business Center; 1997-1998.',
     'Diploma en Finanzas; ITESM; 1994 - 1995.',
   ],
   languages: [
@@ -176,14 +224,8 @@ const MarqueeCarousel = () => {
       onMouseLeave={() => setIsHovering(false)}
     >
       <div className={`marquee-container ${isHovering ? 'paused' : ''}`}>
-        {phrases.map((item, i) => (
-          <div key={`a-${i}`} className="marquee-item">
-            <span className="icon">{item.icon}</span>
-            <span>{item.text}</span>
-          </div>
-        ))}
-        {phrases.map((item, i) => (
-          <div key={`b-${i}`} className="marquee-item">
+        {[...phrases, ...phrases].map((item, index) => (
+          <div key={index} className="marquee-item">
             <span className="icon">{item.icon}</span>
             <span>{item.text}</span>
           </div>
@@ -230,7 +272,7 @@ const TypingEffect = ({ text }: { text: string }) => {
     </h2>
   );
 };
-// ================== NAV ==================
+// ================== NAV (controles móviles pegados a la derecha) ==================
 const Navigation = ({
   activeSection,
   onNavigate,
@@ -274,7 +316,7 @@ const Navigation = ({
                 <span className="block">DELGADO</span>
               </h1>
 
-              {/* Desktop: botones */}
+              {/* Botones desktop */}
               <div className="mt-3 hidden lg:flex items-center justify-center gap-3">
                 <button
                   onClick={toggleDark}
@@ -301,7 +343,7 @@ const Navigation = ({
             </div>
           </div>
 
-          {/* Móvil: controles fijos a la derecha */}
+          {/* CONTROLES MÓVILES A LA DERECHA */}
           <div className="lg:hidden absolute right-4 top-1/2 -translate-y-1/2 z-10 flex items-center gap-2">
             <button
               onClick={toggleDark}
@@ -359,31 +401,48 @@ const Navigation = ({
 };
 
 // ================== SECCIÓN GENÉRICA ==================
-const Section = forwardRef(({ id, title, children }: { id: string; title: string; children: ReactNode }, ref: any) => {
-  const isExpandableSection = id === 'experiencia' || id === 'proyectos';
-  return (
-    <section
-      id={id}
-      ref={ref}
-      className="cv-section bg-white dark:bg-slate-900/60 p-4 sm:p-6 md:p-8 rounded-2xl shadow-xl mb-12 transform hover:scale-[1.01] transition-transform duration-300"
-    >
-      <div className="flex items-center gap-4 mb-6 border-b pb-4 border-amber-600">
-        <h2 className="text-2xl sm:text-3xl font-bold text-[#4a688b] dark:text-[#93c5fd] font-sans">{title}</h2>
-        {isExpandableSection && (
-          <div className="flex items-center text-gray-500 dark:text-gray-300 ml-2">
-            <Info size={16} className="mr-1" />
-            <p className="text-sm font-medium">Presiona cada contenedor para desplegar información</p>
-          </div>
-        )}
-      </div>
-      {children}
-    </section>
-  );
-});
+const Section = forwardRef(
+  (
+    { id, title, children }: { id: string; title: string; children: ReactNode },
+    ref: any
+  ) => {
+    const isExpandableSection = id === 'experiencia' || id === 'proyectos';
+    return (
+      <section
+        id={id}
+        ref={ref}
+        className="cv-section bg-white dark:bg-slate-900/60 p-4 sm:p-6 md:p-8 rounded-2xl shadow-xl mb-12 transform hover:scale-[1.01] transition-transform duration-300"
+      >
+        <div className="flex items-center gap-4 mb-6 border-b pb-4 border-amber-600">
+          <h2 className="text-2xl sm:text-3xl font-bold text-[#4a688b] dark:text-[#93c5fd] font-sans">{title}</h2>
+          {isExpandableSection && (
+            <div className="flex items-center text-gray-500 dark:text-gray-300 ml-2">
+              <Info size={16} className="mr-1" />
+              <p className="text-sm font-medium">Presiona cada contenedor para desplegar información</p>
+            </div>
+          )}
+        </div>
+        {children}
+      </section>
+    );
+  }
+);
 
 // ================== ITEM COLAPSABLE ==================
-const CollapsibleExperience = ({ date, title, company, location, description, icon }: {
-  date: string; title: string; company?: string; location?: string; description: string[]; icon: ReactNode;
+const CollapsibleExperience = ({
+  date,
+  title,
+  company,
+  location,
+  description,
+  icon,
+}: {
+  date: string;
+  title: string;
+  company?: string;
+  location?: string;
+  description: string[];
+  icon: ReactNode;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const contentRef = useRef<HTMLDivElement | null>(null);
@@ -409,12 +468,24 @@ const CollapsibleExperience = ({ date, title, company, location, description, ic
             {location && <p className="text-sm text-gray-500 dark:text-gray-300">{location}</p>}
           </div>
         </div>
-        <svg className={`w-6 h-6 transform transition-transform duration-300 text-[#4a688b] dark:text-slate-100 ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg
+          className={`w-6 h-6 transform transition-transform duration-300 text-[#4a688b] dark:text-slate-100 ${
+            isOpen ? 'rotate-180' : ''
+          }`}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       </button>
 
-      <div ref={contentRef} data-collapsible-content="true" className="overflow-hidden transition-[max-height] duration-500 ease-in-out" style={{ maxHeight: '0px' }}>
+      <div
+        ref={contentRef}
+        data-collapsible-content="true"
+        className="overflow-hidden transition-[max-height] duration-500 ease-in-out"
+        style={{ maxHeight: '0px' }}
+      >
         <div className="px-6 pb-6 pt-2 border-t border-gray-200 dark:border-slate-700">
           <ul className="list-none space-y-2">
             {description.map((item, index) => (
@@ -430,7 +501,7 @@ const CollapsibleExperience = ({ date, title, company, location, description, ic
   );
 };
 
-// ================== CARDS ==================
+// ================== CARDS (igual que tenías) ==================
 const ProfileCard = ({ icon, text }: { icon: ReactNode; text: string }) => (
   <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 mb-4 border border-gray-200 dark:border-slate-700">
     <div className="flex items-start">
@@ -440,12 +511,24 @@ const ProfileCard = ({ icon, text }: { icon: ReactNode; text: string }) => (
   </div>
 );
 
-const EducationCard = ({ icon, iconColor, title, period, description }: {
-  icon: ReactNode; iconColor: string; title: string; period: string; description: string | string[];
+const EducationCard = ({
+  icon,
+  iconColor,
+  title,
+  period,
+  description,
+}: {
+  icon: ReactNode;
+  iconColor: string;
+  title: string;
+  period: string;
+  description: string | string[];
 }) => (
   <div className="cv-break bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 mb-4 border border-gray-200 dark:border-slate-700">
     <div className="flex items-start">
-      <div className="mr-4 flex-shrink-0" style={{ color: iconColor }}>{icon}</div>
+      <div className="mr-4 flex-shrink-0" style={{ color: iconColor }}>
+        {icon}
+      </div>
       <div>
         <h3 className="text-lg font-bold text-[#4a688b] dark:text-slate-100">{title}</h3>
         <p className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">{period}</p>
@@ -492,20 +575,46 @@ const LanguageCard = ({ language, proficiency }: { language: string; proficiency
   </div>
 );
 
-const SkillsCard = ({ title, icon, iconColor, children }: { title: string; icon: ReactNode; iconColor: string; children: ReactNode; }) => (
+const SkillsCard = ({
+  title,
+  icon,
+  iconColor,
+  children,
+}: {
+  title: string;
+  icon: ReactNode;
+  iconColor: string;
+  children: ReactNode;
+}) => (
   <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 mb-4 border border-gray-200 dark:border-slate-700">
     <div className="flex items-center mb-4">
-      <div className="mr-4 flex-shrink-0" style={{ color: iconColor }}>{icon}</div>
+      <div className="mr-4 flex-shrink-0" style={{ color: iconColor }}>
+        {icon}
+      </div>
       <h3 className="text-lg font-bold text-[#4a688b] dark:text-slate-100">{title}</h3>
     </div>
     {children}
   </div>
 );
 
-const ContactCard = ({ icon, label, value, href }: { icon: ReactNode; label: string; value: string; href?: string; }) => {
+const ContactCard = ({
+  icon,
+  label,
+  value,
+  href,
+}: {
+  icon: ReactNode;
+  label: string;
+  value: string;
+  href?: string;
+}) => {
   const isLink = !!href;
   const inner = (
-    <div className={`cv-break bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 mb-4 border border-gray-200 dark:border-slate-700 transition-all duration-300 ${isLink ? 'bg-gray-100/60 dark:bg-slate-700/40' : ''}`}>
+    <div
+      className={`cv-break bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 mb-4 border border-gray-200 dark:border-slate-700 transition-all duration-300 ${
+        isLink ? 'bg-gray-100/60 dark:bg-slate-700/40' : ''
+      }`}
+    >
       <div className="flex items-start justify-between">
         <div className="flex items-start">
           <div className="mr-4 text-amber-600 mt-1 flex-shrink-0">{icon}</div>
@@ -571,10 +680,18 @@ const App = () => {
     return () => observer.disconnect();
   }, []);
 
-  // --- DESCARGA PDF (captura completa + paginado robusto + SAVE robusto) ---
+  // --- DESCARGA PDF (captura completa + paginado + FIX gesto de usuario) ---
   const handleDownloadPDF = async () => {
     const root = wrapperRef.current;
     if (!root) return;
+
+    // Detectar Safari / iOS y abrir ventana de inmediato para conservar gesto
+    const ua = navigator.userAgent || '';
+    const isIOS = /iPad|iPhone|iPod/.test(ua) || (/\bMacintosh\b/.test(ua) && 'ontouchend' in document);
+    const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
+    const needsNewTab = isIOS || isSafari;
+    const preWin = needsNewTab ? window.open('', '_blank') : null;
+    if (preWin) preWin.document.write('<html><head><title>Generando PDF…</title></head><body style="font:14px system-ui;padding:24px;color:#334"><b>Generando PDF…</b></body></html>');
 
     if (window.matchMedia('(min-width: 1024px)').matches) {
       document.body.classList.add('capture-pdf');
@@ -611,6 +728,7 @@ const App = () => {
     const imgWidth = pageWidth;
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
+    // Paginado robusto
     const pxToPdf = imgWidth / canvas.width;
     const pdfToPx = 1 / pxToPdf;
     const domPageHeight = pageHeight * pdfToPx;
@@ -656,48 +774,39 @@ const App = () => {
       pdf.addImage(imgData, 'PNG', 0, -startPx * pxToPdf, imgWidth, imgHeight);
     });
 
-    // ======= DESCARGA ROBUSTA (desktop + Android + iOS Safari) =======
-    const filename = 'CV_Areli_Aguilar.pdf';
+    // Guardado definitivo
+    const fileName = 'CV_Areli_Aguilar.pdf';
     try {
-      const blob = pdf.output('blob');
-      const url = URL.createObjectURL(blob);
-
-      // iOS Safari / iPadOS: preferir abrir en nueva pestaña
-      const ua = navigator.userAgent || '';
-      const isIOS = /iPad|iPhone|iPod/.test(ua) || (/\bMacintosh\b/.test(ua) && 'ontouchend' in document);
-
-      if (isIOS) {
-        // Abrir en nueva pestaña garantiza que el usuario pueda “Compartir/Guardar”
-        window.open(url, '_blank');
-        // revocar luego de un tiempo
-        setTimeout(() => URL.revokeObjectURL(url), 4000);
+      if (preWin) {
+        // En Safari/iOS abrimos en la pestaña pre-creada (mantiene el gesto)
+        const dataUrl = pdf.output('dataurlstring');
+        preWin.location.href = dataUrl;
       } else {
-        // Descarga directa estándar
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        setTimeout(() => URL.revokeObjectURL(url), 1500);
+        // En el resto, descarga directa
+        pdf.save(fileName);
       }
     } catch (e) {
-      // Fallback final
-      try { pdf.save(filename); } catch {}
+      // Fallback por si algo falla
+      try { pdf.save(fileName); } catch {}
     }
 
+    // Restaurar estados
     collapsibles.forEach((el, i) => { el.style.maxHeight = prevHeights[i]; });
     document.body.classList.remove('capture-pdf');
   };
 
   return (
-    <div ref={wrapperRef} id="cv-container" className="min-h-screen bg-gray-50 dark:bg-[#0b1220] font-sans antialiased text-gray-800 dark:text-gray-100">
+    <div
+      ref={wrapperRef}
+      id="cv-container"
+      className="min-h-screen bg-gray-50 dark:bg-[#0b1220] font-sans antialiased text-gray-800 dark:text-gray-100"
+    >
       <style>{`
       .typing-cursor{display:inline-block;animation:blink-caret .75s step-end infinite;opacity:1}
       @keyframes blink-caret{from,to{opacity:0}50%{opacity:1}}
 
       @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-      .marquee-container{display:flex;height:100%;width:max-content;animation:marquee 30s linear infinite;will-change:transform}
+      .marquee-container{display:flex;height:100%;width:max-content;animation:marquee 60s linear infinite;will-change:transform}
       .marquee-container.paused{animation-play-state:paused}
       .marquee-item{flex-shrink:0;display:flex;align-items:center;white-space:nowrap;padding:0 1.75rem;font-family:'Inter',sans-serif;font-size:1.1rem;font-weight:400;color:#4a688b}
       @media (max-width:1023px){.marquee-item{font-size:.95rem;padding:0 1rem}}
@@ -727,7 +836,7 @@ const App = () => {
         onDownloadPDF={handleDownloadPDF}
       />
 
-      {/* Carrusel + título móvil */}
+      {/* Carrusel superior y título móvil */}
       <div className="pt-16 lg:pt-0 lg:ml-80">
         <MarqueeCarousel />
         <div className="px-4 pt-2 block lg:hidden">
@@ -736,16 +845,21 @@ const App = () => {
       </div>
 
       <main className="lg:ml-80 p-6 lg:p-8">
+        {/* Perfil */}
         <Section ref={(el) => (sectionRefs.current.perfil = el)} id="perfil" title="Perfil Profesional">
           {portfolioData.profile.map((item, index) => (
             <ProfileCard key={index} icon={item.icon} text={item.text} />
           ))}
         </Section>
 
+        {/* Habilidades */}
         <Section ref={(el) => (sectionRefs.current.habilidades = el)} id="habilidades" title="Habilidades Destacadas">
           <div className="space-y-6">
             <SkillsCard title="Experiencia Ejecutiva" icon={<Briefcase size={24} />} iconColor="#d97706">
-              <p className="text-gray-700 dark:text-gray-200">Más de 15 años de experiencia realizando gestiones administrativas clave a nivel ejecutivo para la alta dirección.</p>
+              <p className="text-gray-700 dark:text-gray-200">
+                Más de 15 años de experiencia realizando gestiones administrativas clave a nivel ejecutivo para la alta
+                dirección.
+              </p>
             </SkillsCard>
 
             <SkillsCard title="Habilidades de Gestión Gerencial" icon={<LayoutDashboard size={24} />} iconColor="#d97706">
@@ -760,7 +874,9 @@ const App = () => {
             </SkillsCard>
 
             <SkillsCard title="Competencias" icon={<Gem size={24} />} iconColor="#d97706">
-              <p className="text-gray-700 dark:text-gray-200 mb-4">- Desliza el cursor sobre cada competencia para conocer más detalles.</p>
+              <p className="text-gray-700 dark:text-gray-200 mb-4">
+                - Desliza el cursor sobre cada competencia para conocer más detalles.
+              </p>
               <div className="flex flex-wrap gap-2">
                 {Object.entries(portfolioData.skills.tooltips).map(([label, tooltip], idx) => (
                   <div key={idx} className="relative group">
@@ -777,11 +893,15 @@ const App = () => {
             </SkillsCard>
 
             <SkillsCard title="Enfoque de Colaboración" icon={<HeartHandshake size={24} />} iconColor="#d97706">
-              <p className="text-gray-700 dark:text-gray-200">Habilidades destacadas para generar confianza, facilitar la cooperación y fomentar un ambiente de alto rendimiento.</p>
+              <p className="text-gray-700 dark:text-gray-200">
+                Habilidades destacadas para generar confianza, facilitar la cooperación y fomentar un ambiente de alto
+                rendimiento.
+              </p>
             </SkillsCard>
           </div>
         </Section>
 
+        {/* Experiencia */}
         <Section ref={(el) => (sectionRefs.current.experiencia = el)} id="experiencia" title="Experiencia Profesional">
           {portfolioData.experience.map((exp, index) => (
             <CollapsibleExperience
@@ -796,6 +916,7 @@ const App = () => {
           ))}
         </Section>
 
+        {/* Proyectos */}
         <Section ref={(el) => (sectionRefs.current.proyectos = el)} id="proyectos" title="Proyectos de Innovación y Transformación Digital">
           {portfolioData.projects.map((project, index) => (
             <CollapsibleExperience
@@ -808,6 +929,7 @@ const App = () => {
           ))}
         </Section>
 
+        {/* Educación */}
         <Section ref={(el) => (sectionRefs.current.educacion = el)} id="educacion" title="Educación Académica">
           {portfolioData.education.map((edu, index) => (
             <EducationCard
@@ -822,6 +944,7 @@ const App = () => {
           <OtherStudies items={portfolioData.otherStudies} />
         </Section>
 
+        {/* Idiomas */}
         <Section ref={(el) => (sectionRefs.current.idiomas = el)} id="idiomas" title="Idiomas">
           <div className="flex flex-col md:flex-row gap-4">
             {portfolioData.languages.map((lang, index) => (
@@ -830,11 +953,27 @@ const App = () => {
           </div>
         </Section>
 
+        {/* Contacto */}
         <Section ref={(el) => (sectionRefs.current.contacto = el)} id="contacto" title="Contacto">
           <div className="grid md:grid-cols-2 gap-4">
-            <ContactCard icon={<Mail size={24} />} label="Correo Electrónico" value={portfolioData.contact.email} href={`mailto:${portfolioData.contact.email}`} />
-            <ContactCard icon={<Linkedin size={24} />} label="LinkedIn" value="Perfil de LinkedIn" href={portfolioData.contact.linkedin} />
-            <ContactCard icon={<Phone size={24} />} label="Teléfono" value={portfolioData.contact.phone} href={`tel:${portfolioData.contact.phone.replace(/\s+/g, '')}`} />
+            <ContactCard
+              icon={<Mail size={24} />}
+              label="Correo Electrónico"
+              value={portfolioData.contact.email}
+              href={`mailto:${portfolioData.contact.email}`}
+            />
+            <ContactCard
+              icon={<Linkedin size={24} />}
+              label="LinkedIn"
+              value="Perfil de LinkedIn"
+              href={portfolioData.contact.linkedin}
+            />
+            <ContactCard
+              icon={<Phone size={24} />}
+              label="Teléfono"
+              value={portfolioData.contact.phone}
+              href={`tel:${portfolioData.contact.phone.replace(/\s+/g, '')}`}
+            />
           </div>
         </Section>
       </main>
