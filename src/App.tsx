@@ -278,7 +278,7 @@ const TypingEffect = ({ text }: { text: string }) => {
     </h2>
   );
 };
-// ================== NAV (móvil compacto, desktop intacto) ==================
+// ================== NAV (botones fijos y tamaños iguales) ==================
 const Navigation = ({
   activeSection,
   onNavigate,
@@ -309,14 +309,14 @@ const Navigation = ({
   return (
     <nav className="app-nav fixed lg:left-0 top-0 w-full lg:w-80 h-16 lg:h-screen bg-[#1e2a38] text-gray-200 shadow-2xl z-50">
       <div className="container mx-auto px-4 lg:px-0 h-full flex items-center justify-between lg:block">
-        {/* Fila superior */}
+        {/* Cabecera */}
         <div className="flex items-center justify-between lg:block lg:py-8">
-          {/* Identidad */}
+          {/* Identidad + título */}
           <div className="flex items-center lg:flex-col lg:text-center">
             <User size={32} className="text-amber-600 mr-3 lg:mb-4" />
             <div className="flex flex-col">
-              {/* Tipeo solo desktop */}
-              <div className="hidden lg:block">
+              {/* Tipeo SOLO desktop, ancho fijo para no empujar los botones */}
+              <div className="hidden lg:block w-[240px] overflow-hidden">
                 <TypingEffect text="CURRICULUM VITAE" />
               </div>
               {/* Nombre estático */}
@@ -326,22 +326,20 @@ const Navigation = ({
                 <span className="block">DELGADO</span>
               </h1>
 
-              {/* Botones desktop (se mantiene) */}
+              {/* Botones en DESKTOP (tamaño 36px, iguales) */}
               <div className="mt-3 hidden lg:flex items-center gap-3">
                 <button
                   onClick={toggleDark}
-                  className="w-9 h-9 rounded-full border border-white/30 flex items-center justify-center hover:bg-white/10 transition"
+                  className="w-9 h-9 rounded-full border border-white/30 flex items-center justify-center hover:bg-white/10 transition focus:outline-none"
                   aria-label="Alternar modo"
                   title={isDark ? 'Modo claro' : 'Modo oscuro'}
                 >
                   {isDark ? <Sun size={18} /> : <Moon size={18} />}
                 </button>
-
-                {/* Descargar con tooltip hover (solo desktop) */}
                 <div className="relative group">
                   <button
                     onClick={onDownloadPDF}
-                    className="w-9 h-9 rounded-full border border-white/30 flex items-center justify-center hover:bg-white/10 transition"
+                    className="w-9 h-9 rounded-full border border-white/30 flex items-center justify-center hover:bg-white/10 transition focus:outline-none"
                     aria-label="Descargar CV"
                     title="Descargar CV"
                   >
@@ -355,11 +353,11 @@ const Navigation = ({
             </div>
           </div>
 
-          {/* Controles móviles a la derecha */}
+          {/* Controles en MÓVIL (tamaño 32px, iguales) */}
           <div className="flex items-center gap-2 lg:hidden">
             <button
               onClick={toggleDark}
-              className="w-8 h-8 rounded-full border border-white/30 flex items-center justify-center hover:bg-white/10 transition"
+              className="w-8 h-8 rounded-full border border-white/30 flex items-center justify-center hover:bg-white/10 transition focus:outline-none"
               aria-label="Alternar modo"
               title={isDark ? 'Modo claro' : 'Modo oscuro'}
             >
@@ -367,12 +365,13 @@ const Navigation = ({
             </button>
             <button
               onClick={onDownloadPDF}
-              className="w-8 h-8 rounded-full border border-white/30 flex items-center justify-center hover:bg-white/10 transition"
+              className="w-8 h-8 rounded-full border border-white/30 flex items-center justify-center hover:bg-white/10 transition focus:outline-none"
               aria-label="Descargar CV"
               title="Descargar CV"
             >
               <Download size={18} />
             </button>
+            {/* Hamburguesa */}
             <button
               onClick={toggleMobileMenu}
               className="ml-1 text-gray-200 hover:text-gray-400 focus:outline-none"
@@ -392,7 +391,7 @@ const Navigation = ({
         {/* Separador desktop */}
         <div className="hidden lg:block w-3/4 mx-auto my-4 border-t border-gray-700" />
 
-        {/* Menú */}
+        {/* Menú secciones */}
         <div
           className={`fixed inset-x-0 top-16 bg-[#1e2a38] lg:static lg:block lg:h-auto lg:mt-8 ${
             isMobileMenuOpen ? 'block' : 'hidden'
