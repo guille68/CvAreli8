@@ -311,11 +311,11 @@ const Navigation = ({
       <div className="container mx-auto px-4 lg:px-0 h-full flex items-center justify-between lg:block">
         {/* Fila superior */}
         <div className="flex items-center justify-between lg:block lg:py-8">
-          {/* Identidad (izquierda móvil; centrado desktop) */}
-          <div className="flex items-center lg:flex-col lg:items-center lg:text-center">
+          {/* Identidad (izquierda) */}
+          <div className="flex items-center lg:flex-col lg:items-center lg:text-center flex-1 min-w-0">
             <User size={32} className="text-amber-600 mr-3 lg:mb-4" />
-            <div className="flex flex-col">
-              {/* Título con ancho fijo en desktop */}
+            <div className="flex flex-col min-w-0">
+              {/* Título SOLO desktop (no empuja botones) */}
               <div className="hidden lg:block w-[240px] overflow-hidden">
                 <TypingEffect text="CURRICULUM VITAE" />
               </div>
@@ -325,7 +325,8 @@ const Navigation = ({
                 <span className="block">AGUILAR</span>
                 <span className="block">DELGADO</span>
               </h1>
-              {/* Botones desktop (centrados bajo el nombre) */}
+
+              {/* Botones desktop (centrados) */}
               <div className="mt-3 hidden lg:flex items-center justify-center gap-3">
                 <button
                   onClick={toggleDark}
@@ -352,8 +353,8 @@ const Navigation = ({
             </div>
           </div>
 
-          {/* Controles móviles a la derecha */}
-          <div className="flex items-center gap-2 lg:hidden">
+          {/* Controles móviles a la derecha (SIEMPRE visibles) */}
+          <div className="flex items-center gap-2 lg:hidden shrink-0">
             <button
               onClick={toggleDark}
               className="w-8 h-8 rounded-full border border-white/30 flex items-center justify-center hover:bg-white/10 transition focus:outline-none"
@@ -390,14 +391,23 @@ const Navigation = ({
         <div className="hidden lg:block w-3/4 mx-auto my-4 border-t border-gray-700" />
 
         {/* Menú secciones */}
-        <div className={`fixed inset-x-0 top-16 bg-[#1e2a38] lg:static lg:block lg:h-auto lg:mt-8 ${isMobileMenuOpen ? 'block' : 'hidden'}`}>
+        <div
+          className={`fixed inset-x-0 top-16 bg-[#1e2a38] lg:static lg:block lg:h-auto lg:mt-8 ${
+            isMobileMenuOpen ? 'block' : 'hidden'
+          }`}
+        >
           <ul className="flex flex-col lg:space-y-2 p-4 lg:p-0">
             {sections.map((section) => (
               <li key={section.id}>
                 <a
                   href={`#${section.id}`}
-                  onClick={(e) => { e.preventDefault(); onNavigate(section.id); }}
-                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors duration-200 ${activeSection === section.id ? 'bg-[#4a688b] text-white shadow-lg' : 'hover:bg-gray-800'}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onNavigate(section.id);
+                  }}
+                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors duration-200 ${
+                    activeSection === section.id ? 'bg-[#4a688b] text-white shadow-lg' : 'hover:bg-gray-800'
+                  }`}
                 >
                   {section.icon}
                   <span className="font-semibold">{section.title}</span>
@@ -413,7 +423,10 @@ const Navigation = ({
 
 // ================== SECCIÓN GENÉRICA ==================
 const Section = forwardRef(
-  ({ id, title, children }: { id: string; title: string; children: ReactNode }, ref: any) => {
+  (
+    { id, title, children }: { id: string; title: string; children: ReactNode },
+    ref: any
+  ) => {
     const isExpandableSection = id === 'experiencia' || id === 'proyectos';
     return (
       <section
@@ -511,7 +524,7 @@ const CollapsibleExperience = ({
   );
 };
 
-// ================== CARDS ==================
+// ================== CARDS (…igual que antes) ==================
 const ProfileCard = ({ icon, text }: { icon: ReactNode; text: string }) => (
   <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 mb-4 border border-gray-200 dark:border-slate-700">
     <div className="flex items-start">
@@ -521,24 +534,12 @@ const ProfileCard = ({ icon, text }: { icon: ReactNode; text: string }) => (
   </div>
 );
 
-const EducationCard = ({
-  icon,
-  iconColor,
-  title,
-  period,
-  description,
-}: {
-  icon: ReactNode;
-  iconColor: string;
-  title: string;
-  period: string;
-  description: string | string[];
+const EducationCard = ({ icon, iconColor, title, period, description }: {
+  icon: ReactNode; iconColor: string; title: string; period: string; description: string | string[];
 }) => (
   <div className="cv-break bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 mb-4 border border-gray-200 dark:border-slate-700">
     <div className="flex items-start">
-      <div className="mr-4 flex-shrink-0" style={{ color: iconColor }}>
-        {icon}
-      </div>
+      <div className="mr-4 flex-shrink-0" style={{ color: iconColor }}>{icon}</div>
       <div>
         <h3 className="text-lg font-bold text-[#4a688b] dark:text-slate-100">{title}</h3>
         <p className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">{period}</p>
@@ -585,46 +586,20 @@ const LanguageCard = ({ language, proficiency }: { language: string; proficiency
   </div>
 );
 
-const SkillsCard = ({
-  title,
-  icon,
-  iconColor,
-  children,
-}: {
-  title: string;
-  icon: ReactNode;
-  iconColor: string;
-  children: ReactNode;
-}) => (
+const SkillsCard = ({ title, icon, iconColor, children }: { title: string; icon: ReactNode; iconColor: string; children: ReactNode }) => (
   <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 mb-4 border border-gray-200 dark:border-slate-700">
     <div className="flex items-center mb-4">
-      <div className="mr-4 flex-shrink-0" style={{ color: iconColor }}>
-        {icon}
-      </div>
+      <div className="mr-4 flex-shrink-0" style={{ color: iconColor }}>{icon}</div>
       <h3 className="text-lg font-bold text-[#4a688b] dark:text-slate-100">{title}</h3>
     </div>
     {children}
   </div>
 );
 
-const ContactCard = ({
-  icon,
-  label,
-  value,
-  href,
-}: {
-  icon: ReactNode;
-  label: string;
-  value: string;
-  href?: string;
-}) => {
+const ContactCard = ({ icon, label, value, href }: { icon: ReactNode; label: string; value: string; href?: string }) => {
   const isLink = !!href;
   const inner = (
-    <div
-      className={`cv-break bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 mb-4 border border-gray-200 dark:border-slate-700 transition-all duration-300 ${
-        isLink ? 'bg-gray-100/60 dark:bg-slate-700/40' : ''
-      }`}
-    >
+    <div className={`cv-break bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 mb-4 border border-gray-200 dark:border-slate-700 transition-all duration-300 ${isLink ? 'bg-gray-100/60 dark:bg-slate-700/40' : ''}`}>
       <div className="flex items-start justify-between">
         <div className="flex items-start">
           <div className="mr-4 text-amber-600 mt-1 flex-shrink-0">{icon}</div>
@@ -633,19 +608,12 @@ const ContactCard = ({
             <p className="text-lg font-bold text-[#4a688b] dark:text-slate-100 break-words">{value}</p>
           </div>
         </div>
-        {isLink && (
-          <div className="transition-opacity duration-300">
-            <ArrowRight size={24} className="text-[#4a688b] dark:text-slate-100" />
-          </div>
-        )}
+        {isLink && <ArrowRight size={24} className="text-[#4a688b] dark:text-slate-100" />}
       </div>
     </div>
   );
-
   return isLink ? (
-    <a href={href} className="block" target="_blank" rel="noopener noreferrer">
-      {inner}
-    </a>
+    <a href={href} className="block" target="_blank" rel="noopener noreferrer">{inner}</a>
   ) : (
     <div className="block cursor-default">{inner}</div>
   );
@@ -655,15 +623,13 @@ const App = () => {
   const [activeSection, setActiveSection] = useState('perfil');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Tema claro/oscuro estable + sin parpadeo
+  // Tema claro/oscuro (sin parpadeo)
   const getInitialDark = () => {
     try {
       const saved = localStorage.getItem('theme');
       if (saved) return saved === 'dark';
       return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    } catch {
-      return false;
-    }
+    } catch { return false; }
   };
   const [isDark, setIsDark] = useState<boolean>(getInitialDark());
   useLayoutEffect(() => {
@@ -675,7 +641,7 @@ const App = () => {
     document.documentElement.classList.toggle('dark', isDark);
     try { localStorage.setItem('theme', isDark ? 'dark' : 'light'); } catch {}
   }, [isDark]);
-  const toggleDark = () => setIsDark((d) => !d);
+  const toggleDark = () => setIsDark(d => !d);
 
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
   const wrapperRef = useRef<HTMLDivElement | null>(null);
@@ -686,7 +652,7 @@ const App = () => {
     setIsMobileMenuOpen(false);
   };
 
-  // Resaltar sección activa
+  // Activo en menú
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => entries.forEach((e) => e.isIntersecting && setActiveSection(e.target.id)),
@@ -696,14 +662,17 @@ const App = () => {
     return () => observer.disconnect();
   }, []);
 
-  // --- DESCARGA PDF: cortes en anclas seguras + franja azul extendida SOLO en desktop ---
+  // --- DESCARGA PDF (móvil con fallback de descarga, desktop con franja azul extendida) ---
   const handleDownloadPDF = async () => {
     const root = wrapperRef.current;
     if (!root) return;
 
-    document.body.classList.add('capture-pdf'); // agrega pseudo-franja azul en desktop
+    // Franja azul extendida SOLO desktop
+    if (window.matchMedia('(min-width: 1024px)').matches) {
+      document.body.classList.add('capture-pdf');
+    }
 
-    // 1) Expandir colapsables
+    // Expandir colapsables
     window.scrollTo(0, 0);
     const collapsibles = Array.from(root.querySelectorAll<HTMLElement>('[data-collapsible-content="true"]'));
     const prevHeights = collapsibles.map((el) => el.style.maxHeight);
@@ -711,7 +680,6 @@ const App = () => {
 
     await new Promise((r) => setTimeout(r, 250));
 
-    // 2) Capturar
     const bg = getComputedStyle(root).backgroundColor || (isDark ? '#0b1220' : '#ffffff');
     const canvas = await html2canvas(root, {
       scale: 2,
@@ -724,7 +692,7 @@ const App = () => {
       scrollY: -window.scrollY,
     });
 
-    // 3) Paginado con “anclas” seguras
+    // Paginado con anclas seguras
     const imgData = canvas.toDataURL('image/png');
     const pdf = new jsPDF('p', 'pt', 'a4');
     const pageWidth = pdf.internal.pageSize.getWidth();
@@ -736,43 +704,57 @@ const App = () => {
     const pdfToPx = 1 / pxToPdf;
     const domPageHeight = pageHeight * pdfToPx;
 
-    const rootRect = root.getBoundingClientRect();
     const safeNodes = Array.from(root.querySelectorAll<HTMLElement>('.cv-section, .cv-break'));
-    const safeTopsSet = new Set<number>([0, canvas.height]);
-    safeNodes.forEach((n) => {
+    const rootRect = root.getBoundingClientRect();
+    const tops = new Set<number>([0, canvas.height]);
+    safeNodes.forEach(n => {
       const r = n.getBoundingClientRect();
-      const topAbs = r.top - rootRect.top + window.scrollY;
-      safeTopsSet.add(Math.max(0, Math.round(topAbs)));
+      tops.add(Math.max(0, Math.round(r.top - rootRect.top + window.scrollY)));
     });
-    const safeTops = Array.from(safeTopsSet).sort((a, b) => a - b);
+    const safeTops = Array.from(tops).sort((a,b)=>a-b);
 
-    const pageStartsPx: number[] = [0];
+    const starts: number[] = [0];
     const margin = 24;
     const minAdvance = 120;
-
     while (true) {
-      const lastStart = pageStartsPx[pageStartsPx.length - 1];
-      const limit = lastStart + domPageHeight - margin;
+      const last = starts[starts.length - 1];
+      const limit = last + domPageHeight - margin;
       if (limit >= canvas.height) break;
-      const candidates = safeTops.filter(v => v <= limit && v > lastStart + minAdvance);
-      const nextStart = candidates.length ? candidates[candidates.length - 1] : Math.min(limit, canvas.height);
-      if (nextStart <= lastStart + 1) break;
-      pageStartsPx.push(nextStart);
+      const cand = safeTops.filter(v => v <= limit && v > last + minAdvance);
+      const next = cand.length ? cand[cand.length - 1] : Math.min(limit, canvas.height);
+      if (next <= last + 1) break;
+      starts.push(next);
     }
-    const lastStartNeeded = canvas.height - domPageHeight;
-    if (lastStartNeeded > (pageStartsPx[pageStartsPx.length - 1] ?? 0) + minAdvance) {
-      pageStartsPx.push(Math.max(0, Math.round(lastStartNeeded)));
+    const lastNeed = canvas.height - domPageHeight;
+    if (lastNeed > (starts[starts.length - 1] ?? 0) + minAdvance) {
+      starts.push(Math.max(0, Math.round(lastNeed)));
     }
 
-    pageStartsPx.forEach((startPx, idx) => {
+    starts.forEach((startPx, idx) => {
       if (idx > 0) pdf.addPage();
-      const yPdf = -startPx * pxToPdf;
-      pdf.addImage(imgData, 'PNG', 0, yPdf, imgWidth, imgHeight);
+      pdf.addImage(imgData, 'PNG', 0, -startPx * pxToPdf, imgWidth, imgHeight);
     });
 
-    pdf.save('CV_Areli_Aguilar.pdf');
+    // Guardado: desktop .save(); móvil -> Blob fallback
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    if (isMobile) {
+      const blob = pdf.output('blob');
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = 'CV_Areli_Aguilar.pdf';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        URL.revokeObjectURL(url);
+        a.remove();
+      }, 1200);
+    } else {
+      pdf.save('CV_Areli_Aguilar.pdf');
+    }
 
-    // 4) Restaurar
+    // Restaurar
     collapsibles.forEach((el, i) => { el.style.maxHeight = prevHeights[i]; });
     document.body.classList.remove('capture-pdf');
   };
@@ -796,13 +778,12 @@ const App = () => {
       @media (max-width:1023px){ .marquee-item{ font-size:.95rem; padding:0 1rem; } }
       .marquee-item .icon { color:#d97706; margin-right:.5rem; display:inline-block; vertical-align:middle; }
 
-      /* Chips y contraste */
+      /* Chips y tooltips */
       .skill-chip{ background-color:#e5e7eb; color:#374151; border:1px solid #d1d5db; }
       .dark .skill-chip{ background-color:#334155; color:#f8fafc; border-color:#475569; }
       .dark .competencia-btn{ color:#fff !important; background-color:rgba(255,255,255,.08); }
       .dark .competencia-btn:hover{ background-color:rgba(255,255,255,.16); }
 
-      /* Tooltip: azul en claro, gris-azulado en oscuro */
       .tooltip-content{ background-color:#a8c0d9; color:#0f172a; border:1px solid #93a8c3; }
       .dark .tooltip-content{ background-color:#475569; color:#fff; border:1px solid #94A3B8; }
 
@@ -830,7 +811,7 @@ const App = () => {
         onDownloadPDF={handleDownloadPDF}
       />
 
-      {/* Carrusel superior y "CURRICULUM VITAE" en móvil */}
+      {/* Carrusel + título móvil */}
       <div className="pt-16 lg:pt-0 lg:ml-80">
         <MarqueeCarousel />
         <div className="px-4 pt-2 block lg:hidden">
@@ -850,10 +831,7 @@ const App = () => {
         <Section ref={(el) => (sectionRefs.current.habilidades = el)} id="habilidades" title="Habilidades Destacadas">
           <div className="space-y-6">
             <SkillsCard title="Experiencia Ejecutiva" icon={<Briefcase size={24} />} iconColor="#d97706">
-              <p className="text-gray-700 dark:text-gray-200">
-                Más de 15 años de experiencia realizando gestiones administrativas clave a nivel ejecutivo para la alta
-                dirección.
-              </p>
+              <p className="text-gray-700 dark:text-gray-200">Más de 15 años de experiencia realizando gestiones administrativas clave a nivel ejecutivo para la alta dirección.</p>
             </SkillsCard>
 
             <SkillsCard title="Habilidades de Gestión Gerencial" icon={<LayoutDashboard size={24} />} iconColor="#d97706">
@@ -868,9 +846,7 @@ const App = () => {
             </SkillsCard>
 
             <SkillsCard title="Competencias" icon={<Gem size={24} />} iconColor="#d97706">
-              <p className="text-gray-700 dark:text-gray-200 mb-4">
-                - Desliza el cursor sobre cada competencia para conocer más detalles.
-              </p>
+              <p className="text-gray-700 dark:text-gray-200 mb-4">- Desliza el cursor sobre cada competencia para conocer más detalles.</p>
               <div className="flex flex-wrap gap-2">
                 {Object.entries(portfolioData.skills.tooltips).map(([label, tooltip], idx) => (
                   <div key={idx} className="relative group">
@@ -887,10 +863,7 @@ const App = () => {
             </SkillsCard>
 
             <SkillsCard title="Enfoque de Colaboración" icon={<HeartHandshake size={24} />} iconColor="#d97706">
-              <p className="text-gray-700 dark:text-gray-200">
-                Habilidades destacadas para generar confianza, facilitar la cooperación y fomentar un ambiente de alto
-                rendimiento.
-              </p>
+              <p className="text-gray-700 dark:text-gray-200">Habilidades destacadas para generar confianza, facilitar la cooperación y fomentar un ambiente de alto rendimiento.</p>
             </SkillsCard>
           </div>
         </Section>
@@ -898,42 +871,21 @@ const App = () => {
         {/* Experiencia */}
         <Section ref={(el) => (sectionRefs.current.experiencia = el)} id="experiencia" title="Experiencia Profesional">
           {portfolioData.experience.map((exp, index) => (
-            <CollapsibleExperience
-              key={index}
-              date={exp.date}
-              title={exp.title}
-              company={exp.company}
-              location={(exp as any).location}
-              description={exp.description}
-              icon={exp.icon}
-            />
+            <CollapsibleExperience key={index} date={exp.date} title={exp.title} company={exp.company} location={(exp as any).location} description={exp.description} icon={exp.icon} />
           ))}
         </Section>
 
         {/* Proyectos */}
         <Section ref={(el) => (sectionRefs.current.proyectos = el)} id="proyectos" title="Proyectos de Innovación y Transformación Digital">
           {portfolioData.projects.map((project, index) => (
-            <CollapsibleExperience
-              key={index}
-              date={project.date}
-              title={project.title}
-              description={project.description}
-              icon={project.icon}
-            />
+            <CollapsibleExperience key={index} date={project.date} title={project.title} description={project.description} icon={project.icon} />
           ))}
         </Section>
 
         {/* Educación */}
         <Section ref={(el) => (sectionRefs.current.educacion = el)} id="educacion" title="Educación Académica">
           {portfolioData.education.map((edu, index) => (
-            <EducationCard
-              key={index}
-              icon={edu.icon}
-              iconColor={(edu as any).iconColor}
-              title={edu.title}
-              period={edu.period}
-              description={edu.description}
-            />
+            <EducationCard key={index} icon={edu.icon} iconColor={(edu as any).iconColor} title={edu.title} period={edu.period} description={edu.description} />
           ))}
           <OtherStudies items={portfolioData.otherStudies} />
         </Section>
@@ -950,24 +902,9 @@ const App = () => {
         {/* Contacto */}
         <Section ref={(el) => (sectionRefs.current.contacto = el)} id="contacto" title="Contacto">
           <div className="grid md:grid-cols-2 gap-4">
-            <ContactCard
-              icon={<Mail size={24} />}
-              label="Correo Electrónico"
-              value={portfolioData.contact.email}
-              href={`mailto:${portfolioData.contact.email}`}
-            />
-            <ContactCard
-              icon={<Linkedin size={24} />}
-              label="LinkedIn"
-              value="Perfil de LinkedIn"
-              href={portfolioData.contact.linkedin}
-            />
-            <ContactCard
-              icon={<Phone size={24} />}
-              label="Teléfono"
-              value={portfolioData.contact.phone}
-              href={`tel:${portfolioData.contact.phone.replace(/\s+/g, '')}`}
-            />
+            <ContactCard icon={<Mail size={24} />} label="Correo Electrónico" value={portfolioData.contact.email} href={`mailto:${portfolioData.contact.email}`} />
+            <ContactCard icon={<Linkedin size={24} />} label="LinkedIn" value="Perfil de LinkedIn" href={portfolioData.contact.linkedin} />
+            <ContactCard icon={<Phone size={24} />} label="Teléfono" value={portfolioData.contact.phone} href={`tel:${portfolioData.contact.phone.replace(/\s+/g, '')}`} />
           </div>
         </Section>
       </main>
