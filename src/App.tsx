@@ -363,27 +363,29 @@ const Navigation = ({
 };
 
 // ================== SECCIÓN GENÉRICA ==================
-const Section = forwardRef(({ id, title, children }: { id: string; title: string; children: ReactNode }, ref: any) => {
-  const isExpandableSection = id === 'experiencia' || id === 'proyectos';
-  return (
-    <section
-      id={id}
-      ref={ref}
-      className="cv-section bg-white dark:bg-slate-900/60 p-4 sm:p-6 md:p-8 rounded-2xl shadow-xl mb-12 transform hover:scale-[1.01] transition-transform duration-300"
-    >
-      <div className="flex items-center gap-4 mb-6 border-b pb-4 border-amber-600">
-        <h2 className="text-2xl sm:text-3xl font-bold text-[#4a688b] dark:text-[#93c5fd] font-sans">{title}</h2>
-        {isExpandableSection && (
-          <div className="flex items-center text-gray-500 dark:text-gray-300 ml-2">
-            <Info size={16} className="mr-1" />
-            <p className="text-sm font-medium">Presiona cada contenedor para desplegar información</p>
-          </div>
-        )}
-      </div>
-      {children}
-    </section>
-  );
-});
+const Section = forwardRef(
+  ({ id, title, children }: { id: string; title: string; children: ReactNode }, ref: any) => {
+    const isExpandableSection = id === 'experiencia' || id === 'proyectos';
+    return (
+      <section
+        id={id}
+        ref={ref}
+        className="cv-section bg-white dark:bg-slate-900/60 p-4 sm:p-6 md:p-8 rounded-2xl shadow-xl mb-12 transform hover:scale-[1.01] transition-transform duration-300"
+      >
+        <div className="flex items-center gap-4 mb-6 border-b pb-4 border-amber-600">
+          <h2 className="text-2xl sm:text-3xl font-bold text-[#4a688b] dark:text-[#93c5fd] font-sans">{title}</h2>
+          {isExpandableSection && (
+            <div className="flex items-center text-gray-500 dark:text-gray-300 ml-2">
+              <Info size={16} className="mr-1" />
+              <p className="text-sm font-medium">Presiona cada contenedor para desplegar información</p>
+            </div>
+          )}
+        </div>
+        {children}
+      </section>
+    );
+  }
+);
 
 // ================== ITEM COLAPSABLE ==================
 const CollapsibleExperience = ({ date, title, company, location, description, icon }: {
@@ -433,7 +435,7 @@ const CollapsibleExperience = ({ date, title, company, location, description, ic
       </div>
     </div>
   );
-});
+};
 
 // ================== CARDS ==================
 const ProfileCard = ({ icon, text }: { icon: ReactNode; text: string }) => (
@@ -913,3 +915,4 @@ const App = () => {
 };
 
 export default App;
+
