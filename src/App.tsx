@@ -609,6 +609,17 @@ const App = () => {
   // Permitir múltiples descargas
   const isDownloadingRef = useRef(false);
 
+  // --- Util: offset relativo al contenedor raíz ---
+  const getOffsetTop = (el: HTMLElement, root: HTMLElement) => {
+    let y = 0;
+    let node: HTMLElement | null = el;
+    while (node && node !== root) {
+      y += node.offsetTop;
+      node = node.offsetParent as HTMLElement | null;
+    }
+    return y;
+  };
+
   // --- DESCARGA PDF (robusto para escritorio + iOS) ---
   const handleDownloadPDF = async () => {
     if (isDownloadingRef.current) return;
@@ -625,14 +636,14 @@ const App = () => {
     // Asegurar top = 0
     window.scrollTo(0, 0);
 
-    // === Spacer final requerido por especificación (temporal durante captura) ===
+    // Spacer final (pie visual profesional)
     const spacer = document.createElement('div');
     spacer.className = 'cv-break';
     spacer.style.width = '1px';
-    spacer.style.height = '320px';
+    spacer.style.height = '340px'; // un poco más para que "Contacto" respire
     root.appendChild(spacer);
 
-    // Sentinela para asegurar que el final se incluya
+    // Sentinela
     const sentinel = document.createElement('div');
     sentinel.className = 'cv-break';
     sentinel.style.width = '1px';
@@ -665,8 +676,7 @@ const App = () => {
         scrollY: 0,
       });
 
-      // Paginado
-      const imgData = canvas.toDataURL('image/png');
+      // ===== Paginado mejorado (sin duplicados, títulos intactos) =====
       const pdf = new jsPDF('p', 'pt', 'a4');
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
@@ -675,44 +685,67 @@ const App = () => {
 
       const pxToPdf = imgWidth / canvas.width;
       const pdfToPx = 1 / pxToPdf;
-      const domPageHeight = pageHeight * pdfToPx - 12; // margen interno fino para evitar cortes
 
-      const rootRect = root.getBoundingClientRect();
-      const anchorNodes = Array.from(root.querySelectorAll<HTMLElement>('.cv-section, .cv-break'));
-      const rawTops = anchorNodes.map(n => Math.max(0, Math.round(n.getBoundingClientRect().top - rootRect.top + window.scrollY)));
-      rawTops.push(0, canvas.height);
-      const safeTops = Array.from(new Set(rawTops)).sort((a, b) => a - b);
+      // Altura útil por página (con pie extra para evitar contacto con el borde)
+      const pageBottomPadding = 32;  // respiración visual extra
+      const domPageHeight = pageHeight * pdfToPx - pageBottomPadding;
 
-      // Ajuste según especificación (márgenes seguros)
+      // Construir anclas seguras
+      const sectionAnchors = Array.from(root.querySelectorAll<HTMLElement>('.cv-section'))
+        .map(n => Math.max(0, Math.round(getOffsetTop(n, root))));
+      const breakAnchors = Array.from(root.querySelectorAll<HTMLElement>('.cv-break'))
+        .map(n => Math.max(0, Math.round(getOffsetTop(n, root))));
+      const anchors = Array.from(new Set([0, ...sectionAnchors, ...breakAnchors, canvas.height]))
+        .sort((a, b) => a - b);
+
+      // Reglas de salto
+      const margin = 56;       // margen superior al calcular el corte
+      const minAdvance = 140;  // no partir demasiado cerca del inicio
+      const firstLineGuard = 80; // bloquea cortes dentro de los primeros píxeles tras el inicio de una sección
+
+      const isSectionTop = (y: number) => sectionAnchors.includes(y);
+
       const starts: number[] = [0];
-      const margin = 48;       // <- estándar de tu prompt
-      const minAdvance = 120;  // <- estándar de tu prompt
-
       while (true) {
         const last = starts[starts.length - 1];
         const limit = last + domPageHeight - margin;
         if (limit >= canvas.height) break;
 
         const lastPossibleStart = Math.max(0, canvas.height - domPageHeight);
-        const candidates = safeTops.filter(v => v > last + minAdvance && v <= limit);
+
+        // Preferir el ancla más alta <= limit, pero nunca dentro del "guard" del título
+        let candidates = anchors.filter(v => v > last + minAdvance && v <= limit);
+
+        // Evitar cortes a pocos px del inicio de una sección
+        candidates = candidates.filter(v => {
+          // Si v es una sección, perfecto; si no, validamos que no esté muy cerca del inicio de una sección
+          const prevAnchor = anchors.find(a => a >= last && a <= v && isSectionTop(a));
+          if (prevAnchor !== undefined && v - prevAnchor < firstLineGuard) return false;
+          return true;
+        });
+
         let next = candidates.length ? candidates[candidates.length - 1] : undefined;
 
-        if (next === undefined) next = safeTops.find(v => v >= limit);
+        if (next === undefined) {
+          // Busca el siguiente ancla >= limit
+          next = anchors.find(v => v >= limit);
+        }
         if (next === undefined) next = lastPossibleStart;
-        else if (next > lastPossibleStart) next = lastPossibleStart;
+        if (next > lastPossibleStart) next = lastPossibleStart;
 
+        // Asegurar avance real
         if (next <= last + minAdvance) next = Math.min(last + domPageHeight, lastPossibleStart);
         if (next <= last) break;
 
         starts.push(Math.round(next));
       }
 
-      const lastStart = starts[starts.length - 1];
-      if (lastStart + domPageHeight < canvas.height) {
-        starts.push(Math.max(0, Math.round(canvas.height - domPageHeight)));
-      }
+      // Normalizar y desduplicar
+      const uniqStarts = Array.from(new Set(starts.map(v => Math.max(0, Math.min(v, canvas.height - 1))))))
+        .sort((a, b) => a - b);
 
-      const uniqStarts = Array.from(new Set(starts)).sort((a, b) => a - b);
+      // Render a PDF
+      const imgData = canvas.toDataURL('image/png');
       uniqStarts.forEach((startPx, idx) => {
         if (idx > 0) pdf.addPage();
         pdf.addImage(imgData, 'PNG', 0, -startPx * pxToPdf, imgWidth, imgHeight);
@@ -740,14 +773,11 @@ const App = () => {
         });
       }
     } finally {
-      // Restaurar siempre, aún si hubo error
-      const rootNow = wrapperRef.current;
-      if (rootNow) {
-        collapsibles.forEach((el, i) => { el.style.maxHeight = prevHeights[i]; });
-        sentinel.remove();
-        spacer.remove();
-      }
+      // Restaurar siempre
+      collapsibles.forEach((el, i) => { el.style.maxHeight = prevHeights[i]; });
       document.body.classList.remove('capture-pdf');
+      sentinel.remove();
+      spacer.remove();
       isDownloadingRef.current = false;
     }
   };
@@ -896,3 +926,4 @@ const App = () => {
 };
 
 export default App;
+
