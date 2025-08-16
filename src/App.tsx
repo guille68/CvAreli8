@@ -433,7 +433,7 @@ const CollapsibleExperience = ({ date, title, company, location, description, ic
       </div>
     </div>
   );
-};
+});
 
 // ================== CARDS ==================
 const ProfileCard = ({ icon, text }: { icon: ReactNode; text: string }) => (
@@ -567,15 +567,11 @@ const App = () => {
   const [activeSection, setActiveSection] = useState('perfil');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Tema claro/oscuro (default a CLARO; si localStorage==='dark', entonces oscuro)
+  // Tema: por defecto CLARO. Solo oscuro si ya estaba guardado.
   const getInitialDark = () => {
-    try {
-      const saved = localStorage.getItem('theme');
-      return saved === 'dark'; // por defecto false (claro)
-    } catch { return false; }
+    try { return localStorage.getItem('theme') === 'dark'; } catch { return false; }
   };
   const [isDark, setIsDark] = useState<boolean>(getInitialDark());
-  // Evitar parpadeo: aplica clase al cargar según localStorage (sin consultar media)
   useLayoutEffect(() => {
     let isDarkInitial = false;
     try { isDarkInitial = localStorage.getItem('theme') === 'dark'; } catch {}
@@ -609,7 +605,7 @@ const App = () => {
   // Permitir múltiples descargas
   const isDownloadingRef = useRef(false);
 
-  // Util: offset relativo al contenedor raíz
+  // Utilidad: offset relativo al contenedor raíz
   const getOffsetTop = (el: HTMLElement, root: HTMLElement) => {
     let y = 0;
     let node: HTMLElement | null = el;
@@ -620,7 +616,7 @@ const App = () => {
     return y;
   };
 
-  // --- DESCARGA PDF (robusto escritorio + iOS) ---
+  // --- DESCARGA PDF (sin duplicados; cortes limpios) ---
   const handleDownloadPDF = async () => {
     if (isDownloadingRef.current) return;
     isDownloadingRef.current = true;
@@ -628,22 +624,21 @@ const App = () => {
     const root = wrapperRef.current;
     if (!root) { isDownloadingRef.current = false; return; }
 
-    // Mostrar columna azul fija en desktop mientras se captura
+    // Mostrar franja azul fija en desktop mientras se captura
     if (window.matchMedia('(min-width: 1024px)').matches) {
       document.body.classList.add('capture-pdf');
     }
 
-    // Asegurar top = 0
+    // Ir al tope
     window.scrollTo(0, 0);
 
-    // Spacer final (aire al pie, evita que "Contacto" pegue al borde)
+    // Spacer (aire al final) + sentinel
     const spacer = document.createElement('div');
     spacer.className = 'cv-break';
     spacer.style.width = '1px';
-    spacer.style.height = '340px';
+    spacer.style.height = '420px';
     root.appendChild(spacer);
 
-    // Sentinela final
     const sentinel = document.createElement('div');
     sentinel.className = 'cv-break';
     sentinel.style.width = '1px';
@@ -658,7 +653,7 @@ const App = () => {
     try {
       await new Promise((r) => setTimeout(r, 250));
 
-      // Captura
+      // Captura DOM completa
       const totalWidth  = Math.max(root.scrollWidth,  root.offsetWidth,  root.clientWidth);
       const totalHeight = Math.max(root.scrollHeight, root.offsetHeight, root.clientHeight, document.documentElement.scrollHeight);
       const bg = getComputedStyle(root).backgroundColor || (isDark ? '#0b1220' : '#ffffff');
@@ -676,46 +671,40 @@ const App = () => {
         scrollY: 0,
       });
 
-      // ===== Paginado determinista por rangos (sin solapes/duplicados) =====
+      // ===== Paginado por rangos + SLICING real del canvas =====
       const pdf = new jsPDF('p', 'pt', 'a4');
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
-      const imgWidth = pageWidth;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-      const pxToPdf = imgWidth / canvas.width;
+      const pxToPdf = pageWidth / canvas.width;          // escala horizontal
       const pdfToPx = 1 / pxToPdf;
 
-      // Altura útil por página con “pie” extra
+      // Altura útil en pixels DOM por página (con padding inferior)
       const pageBottomPadding = 32;
       const domPageHeight = pageHeight * pdfToPx - pageBottomPadding;
 
-      // Anclas seguras (secciones + cv-break)
+      // Anclas seguras
       const sectionAnchors = Array.from(root.querySelectorAll<HTMLElement>('.cv-section'))
         .map(n => Math.max(0, Math.round(getOffsetTop(n, root))));
       const breakAnchors = Array.from(root.querySelectorAll<HTMLElement>('.cv-break'))
         .map(n => Math.max(0, Math.round(getOffsetTop(n, root))));
-      const anchors = Array.from(new Set([0, ...sectionAnchors, ...breakAnchors, canvas.height]))
-        .sort((a, b) => a - b);
-
-      // Reglas
-      const margin = 56;          // margen top para evitar cortes pegados al borde
-      const minAdvance = 140;     // avance mínimo para que no se parta un bloque reciente
-      const titleGuard = 80;      // evita cortar inmediatamente después del encabezado de sección
+      const anchors = Array.from(new Set([0, ...sectionAnchors, ...breakAnchors, canvas.height])).sort((a, b) => a - b);
       const isSectionTop = (y: number) => sectionAnchors.includes(y);
 
-      // Construcción de páginas por [start, end)
-      const starts: number[] = [];
+      // Reglas de corte
+      const margin = 56;
+      const minAdvance = 140;
+      const titleGuard = 80;
+
+      // Construimos cortes como pares [start, end)
+      const cuts: Array<[number, number]> = [];
       let start = 0;
       const maxY = canvas.height;
 
       while (start < maxY - 1) {
-        starts.push(start);
+        const limit = Math.min(maxY, start + domPageHeight - margin);
 
-        const limit = start + domPageHeight - margin;
-        if (limit >= maxY) break;
-
-        // candidatos dentro del rango, respetando guardas de título
+        // candidatos ≤ limit y con guardas para no partir encabezados
         let candidates = anchors.filter(y => y > start + minAdvance && y <= limit);
         candidates = candidates.filter(y => {
           const lastSectionTop = anchors.find(a => a >= start && a <= y && isSectionTop(a));
@@ -723,28 +712,30 @@ const App = () => {
           return true;
         });
 
-        // elegir el corte más alto posible dentro del límite; si no, el siguiente anchor ≥ limit
         let end = candidates.length ? candidates[candidates.length - 1] : anchors.find(y => y >= limit) ?? maxY;
+        if (end <= start + minAdvance) end = Math.min(start + domPageHeight, maxY);
+        if (end <= start) break;
 
-        // garantía de avance real
-        if (end <= start + minAdvance) {
-          // intenta saltar al próximo anchor que garantice avance suficiente
-          const nextEnough = anchors.find(y => y >= start + minAdvance);
-          end = nextEnough !== undefined ? nextEnough : Math.min(start + domPageHeight, maxY);
-        }
-
-        // avanzar exactamente al siguiente inicio (sin solapes -> sin duplicados)
-        start = Math.min(end, maxY);
+        cuts.push([start, end]);
+        start = end;
       }
 
-      // Normalizar y desduplicar
-      const uniqStarts = Array.from(new Set(starts.map(v => Math.max(0, Math.min(v, maxY - 1))))).sort((a, b) => a - b);
+      // Render: recortar cada rango a un canvas parcial (sin solapes -> sin duplicados)
+      cuts.forEach(([from, to], idx) => {
+        const sliceH = to - from;
+        const sliceCanvas = document.createElement('canvas');
+        sliceCanvas.width = canvas.width;
+        sliceCanvas.height = sliceH;
 
-      // Render a PDF
-      const imgData = canvas.toDataURL('image/png');
-      uniqStarts.forEach((startPx, idx) => {
+        const ctx = sliceCanvas.getContext('2d')!;
+        ctx.drawImage(canvas, 0, from, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
+
+        const imgData = sliceCanvas.toDataURL('image/png');
+        const imgW = pageWidth;
+        const imgH = (sliceH * imgW) / canvas.width; // respeta proporción
+
         if (idx > 0) pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, -startPx * pxToPdf, imgWidth, imgHeight);
+        pdf.addImage(imgData, 'PNG', 0, 0, imgW, imgH);
       });
 
       // Guardar
@@ -922,7 +913,3 @@ const App = () => {
 };
 
 export default App;
-
-
-
-
