@@ -646,7 +646,7 @@ const App = () => {
     root.appendChild(sentinel);
 
     // Expandir colapsables
-    const collapsibles = Array.from(root.querySelectorAll<HTMLElement>('[data-collapsible-content="true"]'));
+    const collapsibles = Array.from(root.querySelectorAll('[data-collapsible-content="true"]')) as HTMLElement[];
     const prevHeights = collapsibles.map((el) => el.style.maxHeight);
     collapsibles.forEach((el) => { el.style.maxHeight = `${el.scrollHeight}px`; });
 
@@ -684,10 +684,10 @@ const App = () => {
       const domPageHeight = pageHeight * pdfToPx - pageBottomPadding;
 
       // Anclas seguras
-      const sectionAnchors = Array.from(root.querySelectorAll<HTMLElement>('.cv-section'))
-        .map(n => Math.max(0, Math.round(getOffsetTop(n, root))));
-      const breakAnchors = Array.from(root.querySelectorAll<HTMLElement>('.cv-break'))
-        .map(n => Math.max(0, Math.round(getOffsetTop(n, root))));
+      const sectionEls = Array.from(root.querySelectorAll('.cv-section')) as HTMLElement[];
+      const breakEls   = Array.from(root.querySelectorAll('.cv-break')) as HTMLElement[];
+      const sectionAnchors = sectionEls.map(n => Math.max(0, Math.round(getOffsetTop(n, root))));
+      const breakAnchors   = breakEls.map(n => Math.max(0, Math.round(getOffsetTop(n, root))));
       const anchors = Array.from(new Set([0, ...sectionAnchors, ...breakAnchors, canvas.height])).sort((a, b) => a - b);
       const isSectionTop = (y: number) => sectionAnchors.includes(y);
 
