@@ -609,7 +609,7 @@ const App = () => {
   // Permitir múltiples descargas
   const isDownloadingRef = useRef(false);
 
-  // Util: offset relativo al contenedor raíz (estable y sin layout-thrashing)
+  // Util: offset relativo al contenedor raíz
   const getOffsetTop = (el: HTMLElement, root: HTMLElement) => {
     let y = 0;
     let node: HTMLElement | null = el;
@@ -636,11 +636,11 @@ const App = () => {
     // Asegurar top = 0
     window.scrollTo(0, 0);
 
-    // Spacer final para aire visual y asegurar captura completa
+    // Spacer final (respira el pie y asegura captura completa)
     const spacer = document.createElement('div');
     spacer.className = 'cv-break';
     spacer.style.width = '1px';
-    spacer.style.height = '340px'; // margen de seguridad para que "Contacto" no pegue al borde
+    spacer.style.height = '340px';
     root.appendChild(spacer);
 
     // Sentinela
@@ -733,9 +733,7 @@ const App = () => {
       }
 
       // Normalizar y desduplicar
-      const uniqStarts = Array.from(
-        new Set(starts.map(v => Math.max(0, Math.min(v, canvas.height - 1)))))
-      ).sort((a, b) => a - b);
+      const uniqStarts = Array.from(new Set(starts.map(v => Math.max(0, Math.min(v, canvas.height - 1))))).sort((a, b) => a - b);
 
       // Render a PDF
       const imgData = canvas.toDataURL('image/png');
@@ -919,5 +917,6 @@ const App = () => {
 };
 
 export default App;
+
 
 
