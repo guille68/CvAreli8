@@ -606,119 +606,121 @@ const App = () => {
     return () => observer.disconnect();
   }, []);
 
-  // Permitir múltiples descargas sin bloquear
+  // Permitir múltiples descargas
   const isDownloadingRef = useRef(false);
 
-  // --- DESCARGA PDF (paginado seguro + columna azul fija en desktop) ---
+  // --- DESCARGA PDF (robusto para escritorio + iOS) ---
   const handleDownloadPDF = async () => {
-    const root = wrapperRef.current;
-    if (!root || isDownloadingRef.current) return;
+    if (isDownloadingRef.current) return;
     isDownloadingRef.current = true;
 
+    const root = wrapperRef.current;
+    if (!root) { isDownloadingRef.current = false; return; }
+
+    // Mostrar columna azul fija en desktop mientras se captura
     if (window.matchMedia('(min-width: 1024px)').matches) {
       document.body.classList.add('capture-pdf');
     }
 
+    // Asegurar top = 0
     window.scrollTo(0, 0);
 
-    // Sentinela para asegurar captura del final
+    // Sentinela para asegurar que el final se incluya
     const sentinel = document.createElement('div');
     sentinel.className = 'cv-break';
     sentinel.style.width = '1px';
     sentinel.style.height = '1px';
     root.appendChild(sentinel);
 
-    // 1) Expandir colapsables
+    // Expandir colapsables
     const collapsibles = Array.from(root.querySelectorAll<HTMLElement>('[data-collapsible-content="true"]'));
     const prevHeights = collapsibles.map((el) => el.style.maxHeight);
     collapsibles.forEach((el) => { el.style.maxHeight = `${el.scrollHeight}px`; });
 
-    await new Promise((r) => setTimeout(r, 250));
-
-    // 2) Captura
-    const totalWidth  = Math.max(root.scrollWidth,  root.offsetWidth,  root.clientWidth);
-    const totalHeight = Math.max(root.scrollHeight, root.offsetHeight, root.clientHeight, document.documentElement.scrollHeight);
-    const bg = getComputedStyle(root).backgroundColor || (isDark ? '#0b1220' : '#ffffff');
-
-    const canvas = await html2canvas(root, {
-      scale: 2,
-      useCORS: true,
-      allowTaint: false,
-      backgroundColor: bg,
-      windowWidth: totalWidth,
-      windowHeight: totalHeight,
-      width: totalWidth,
-      height: totalHeight,
-      scrollX: 0,
-      scrollY: 0,
-    });
-
-    // 3) Paginado inteligente
-    const imgData = canvas.toDataURL('image/png');
-    const pdf = new jsPDF('p', 'pt', 'a4');
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const pageHeight = pdf.internal.pageSize.getHeight();
-    const imgWidth = pageWidth;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-    const pxToPdf = imgWidth / canvas.width;
-    const pdfToPx = 1 / pxToPdf;
-    const domPageHeight = pageHeight * pdfToPx - 8;
-
-    const rootRect = root.getBoundingClientRect();
-    const anchorNodes = Array.from(root.querySelectorAll<HTMLElement>('.cv-section, .cv-break'));
-    const rawTops = anchorNodes.map(n => Math.max(0, Math.round(n.getBoundingClientRect().top - rootRect.top + window.scrollY)));
-    rawTops.push(0, canvas.height);
-    const safeTops = Array.from(new Set(rawTops)).sort((a, b) => a - b);
-
-    const starts: number[] = [0];
-    const margin = 24;
-    const minAdvance = 96;
-
-    while (true) {
-      const last = starts[starts.length - 1];
-      const limit = last + domPageHeight - margin;
-      if (limit >= canvas.height) break;
-
-      const lastPossibleStart = Math.max(0, canvas.height - domPageHeight);
-      const candidates = safeTops.filter(v => v > last + minAdvance && v <= limit);
-      let next = candidates.length ? candidates[candidates.length - 1] : undefined;
-
-      if (next === undefined) next = safeTops.find(v => v >= limit);
-      if (next === undefined) next = lastPossibleStart;
-      else if (next > lastPossibleStart) next = lastPossibleStart;
-
-      if (next <= last + minAdvance) next = Math.min(last + domPageHeight, lastPossibleStart);
-      if (next <= last) break;
-
-      starts.push(Math.round(next));
-    }
-
-    const lastStart = starts[starts.length - 1];
-    if (lastStart + domPageHeight < canvas.height) {
-      starts.push(Math.max(0, Math.round(canvas.height - domPageHeight)));
-    }
-
-    const uniqStarts = Array.from(new Set(starts)).sort((a, b) => a - b);
-    uniqStarts.forEach((startPx, idx) => {
-      if (idx > 0) pdf.addPage();
-      pdf.addImage(imgData, 'PNG', 0, -startPx * pxToPdf, imgWidth, imgHeight);
-    });
-
-    // 4) Guardar (soporta múltiples usos)
-    const filename = 'CV_Areli_Aguilar.pdf';
-    const ua = navigator.userAgent || '';
-    const isIOS = /iPad|iPhone|iPod/.test(ua) || (/\bMacintosh\b/.test(ua) && 'ontouchend' in document);
-
     try {
+      await new Promise((r) => setTimeout(r, 250));
+
+      // Captura
+      const totalWidth  = Math.max(root.scrollWidth,  root.offsetWidth,  root.clientWidth);
+      const totalHeight = Math.max(root.scrollHeight, root.offsetHeight, root.clientHeight, document.documentElement.scrollHeight);
+      const bg = getComputedStyle(root).backgroundColor || (isDark ? '#0b1220' : '#ffffff');
+
+      const canvas = await html2canvas(root, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: false,
+        backgroundColor: bg,
+        windowWidth: totalWidth,
+        windowHeight: totalHeight,
+        width: totalWidth,
+        height: totalHeight,
+        scrollX: 0,
+        scrollY: 0,
+      });
+
+      // Paginado
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'pt', 'a4');
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = pageWidth;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      const pxToPdf = imgWidth / canvas.width;
+      const pdfToPx = 1 / pxToPdf;
+      const domPageHeight = pageHeight * pdfToPx - 8;
+
+      const rootRect = root.getBoundingClientRect();
+      const anchorNodes = Array.from(root.querySelectorAll<HTMLElement>('.cv-section, .cv-break'));
+      const rawTops = anchorNodes.map(n => Math.max(0, Math.round(n.getBoundingClientRect().top - rootRect.top + window.scrollY)));
+      rawTops.push(0, canvas.height);
+      const safeTops = Array.from(new Set(rawTops)).sort((a, b) => a - b);
+
+      const starts: number[] = [0];
+      const margin = 24;
+      const minAdvance = 96;
+
+      while (true) {
+        const last = starts[starts.length - 1];
+        const limit = last + domPageHeight - margin;
+        if (limit >= canvas.height) break;
+
+        const lastPossibleStart = Math.max(0, canvas.height - domPageHeight);
+        const candidates = safeTops.filter(v => v > last + minAdvance && v <= limit);
+        let next = candidates.length ? candidates[candidates.length - 1] : undefined;
+
+        if (next === undefined) next = safeTops.find(v => v >= limit);
+        if (next === undefined) next = lastPossibleStart;
+        else if (next > lastPossibleStart) next = lastPossibleStart;
+
+        if (next <= last + minAdvance) next = Math.min(last + domPageHeight, lastPossibleStart);
+        if (next <= last) break;
+
+        starts.push(Math.round(next));
+      }
+
+      const lastStart = starts[starts.length - 1];
+      if (lastStart + domPageHeight < canvas.height) {
+        starts.push(Math.max(0, Math.round(canvas.height - domPageHeight)));
+      }
+
+      const uniqStarts = Array.from(new Set(starts)).sort((a, b) => a - b);
+      uniqStarts.forEach((startPx, idx) => {
+        if (idx > 0) pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, -startPx * pxToPdf, imgWidth, imgHeight);
+      });
+
+      // Guardar
+      const filename = 'CV_Areli_Aguilar.pdf';
+      const ua = navigator.userAgent || '';
+      const isIOS = /iPad|iPhone|iPod/.test(ua) || (/\bMacintosh\b/.test(ua) && 'ontouchend' in document);
+
       if (isIOS) {
+        // iOS: abrir en nueva pestaña para compartir/guardar
         const dataUrl = pdf.output('dataurlstring');
         window.open(dataUrl, '_blank');
       } else {
-        pdf.save(filename);
-      }
-    } catch {
-      try {
+        // ESCRITORIO/MÓVIL NO-iOS: click programático en <a download> (más confiable que pdf.save() en sandbox)
         const blob = pdf.output('blob');
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -726,18 +728,18 @@ const App = () => {
         a.download = filename;
         document.body.appendChild(a);
         a.click();
-        a.remove();
-        setTimeout(() => URL.revokeObjectURL(url), 2000);
-      } catch {
-        try { window.open(pdf.output('dataurlstring'), '_blank'); } catch {}
+        requestAnimationFrame(() => {
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        });
       }
+    } finally {
+      // Restaurar siempre, aún si hubo error
+      collapsibles.forEach((el, i) => { el.style.maxHeight = prevHeights[i]; });
+      document.body.classList.remove('capture-pdf');
+      sentinel.remove();
+      isDownloadingRef.current = false;
     }
-
-    // 5) Restaurar
-    collapsibles.forEach((el, i) => { el.style.maxHeight = prevHeights[i]; });
-    document.body.classList.remove('capture-pdf');
-    sentinel.remove();
-    isDownloadingRef.current = false;
   };
 
   return (
@@ -799,9 +801,7 @@ const App = () => {
         <Section ref={(el) => (sectionRefs.current.habilidades = el)} id="habilidades" title="Habilidades Destacadas">
           <div className="space-y-6">
             <SkillsCard title="Experiencia Ejecutiva" icon={<Briefcase size={24} />} iconColor="#d97706">
-              <p className="text-gray-700 dark:text-gray-200">
-                Más de 15 años de experiencia realizando gestiones administrativas clave a nivel ejecutivo para la alta dirección.
-              </p>
+              <p className="text-gray-700 dark:text-gray-200">Más de 15 años de experiencia realizando gestiones administrativas clave a nivel ejecutivo para la alta dirección.</p>
             </SkillsCard>
 
             <SkillsCard title="Habilidades de Gestión Gerencial" icon={<LayoutDashboard size={24} />} iconColor="#d97706">
@@ -816,9 +816,7 @@ const App = () => {
             </SkillsCard>
 
             <SkillsCard title="Competencias" icon={<Gem size={24} />} iconColor="#d97706">
-              <p className="text-gray-700 dark:text-gray-200 mb-4">
-                - Desliza el cursor sobre cada competencia para conocer más detalles.
-              </p>
+              <p className="text-gray-700 dark:text-gray-200 mb-4">- Desliza el cursor sobre cada competencia para conocer más detalles.</p>
               <div className="flex flex-wrap gap-2">
                 {Object.entries(portfolioData.skills.tooltips).map(([label, tooltip], idx) => (
                   <div key={idx} className="relative group">
@@ -835,9 +833,7 @@ const App = () => {
             </SkillsCard>
 
             <SkillsCard title="Enfoque de Colaboración" icon={<HeartHandshake size={24} />} iconColor="#d97706">
-              <p className="text-gray-700 dark:text-gray-200">
-                Habilidades destacadas para generar confianza, facilitar la cooperación y fomentar un ambiente de alto rendimiento.
-              </p>
+              <p className="text-gray-700 dark:text-gray-200">Habilidades destacadas para generar confianza, facilitar la cooperación y fomentar un ambiente de alto rendimiento.</p>
             </SkillsCard>
           </div>
         </Section>
@@ -858,26 +854,13 @@ const App = () => {
 
         <Section ref={(el) => (sectionRefs.current.proyectos = el)} id="proyectos" title="Proyectos de Innovación y Transformación Digital">
           {portfolioData.projects.map((project, index) => (
-            <CollapsibleExperience
-              key={index}
-              date={project.date}
-              title={project.title}
-              description={project.description}
-              icon={project.icon}
-            />
+            <CollapsibleExperience key={index} date={project.date} title={project.title} description={project.description} icon={project.icon} />
           ))}
         </Section>
 
         <Section ref={(el) => (sectionRefs.current.educacion = el)} id="educacion" title="Educación Académica">
           {portfolioData.education.map((edu, index) => (
-            <EducationCard
-              key={index}
-              icon={edu.icon}
-              iconColor={(edu as any).iconColor}
-              title={edu.title}
-              period={edu.period}
-              description={edu.description}
-            />
+            <EducationCard key={index} icon={edu.icon} iconColor={(edu as any).iconColor} title={edu.title} period={edu.period} description={edu.description} />
           ))}
           <OtherStudies items={portfolioData.otherStudies} />
         </Section>
@@ -892,24 +875,9 @@ const App = () => {
 
         <Section ref={(el) => (sectionRefs.current.contacto = el)} id="contacto" title="Contacto">
           <div className="grid md:grid-cols-2 gap-4">
-            <ContactCard
-              icon={<Mail size={24} />}
-              label="Correo Electrónico"
-              value={portfolioData.contact.email}
-              href={`mailto:${portfolioData.contact.email}`}
-            />
-            <ContactCard
-              icon={<Linkedin size={24} />}
-              label="LinkedIn"
-              value="Perfil de LinkedIn"
-              href={portfolioData.contact.linkedin}
-            />
-            <ContactCard
-              icon={<Phone size={24} />}
-              label="Teléfono"
-              value={portfolioData.contact.phone}
-              href={`tel:${portfolioData.contact.phone.replace(/\s+/g, '')}`}
-            />
+            <ContactCard icon={<Mail size={24} />} label="Correo Electrónico" value={portfolioData.contact.email} href={`mailto:${portfolioData.contact.email}`} />
+            <ContactCard icon={<Linkedin size={24} />} label="LinkedIn" value="Perfil de LinkedIn" href={portfolioData.contact.linkedin} />
+            <ContactCard icon={<Phone size={24} />} label="Teléfono" value={portfolioData.contact.phone} href={`tel:${portfolioData.contact.phone.replace(/\s+/g, '')}`} />
           </div>
         </Section>
       </main>
@@ -918,4 +886,3 @@ const App = () => {
 };
 
 export default App;
-
