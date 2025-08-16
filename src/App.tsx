@@ -609,7 +609,7 @@ const App = () => {
   // Permitir múltiples descargas
   const isDownloadingRef = useRef(false);
 
-  // --- Util: offset relativo al contenedor raíz ---
+  // Util: offset relativo al contenedor raíz (estable y sin layout-thrashing)
   const getOffsetTop = (el: HTMLElement, root: HTMLElement) => {
     let y = 0;
     let node: HTMLElement | null = el;
@@ -636,11 +636,11 @@ const App = () => {
     // Asegurar top = 0
     window.scrollTo(0, 0);
 
-    // Spacer final (pie visual profesional)
+    // Spacer final para aire visual y asegurar captura completa
     const spacer = document.createElement('div');
     spacer.className = 'cv-break';
     spacer.style.width = '1px';
-    spacer.style.height = '340px'; // un poco más para que "Contacto" respire
+    spacer.style.height = '340px'; // margen de seguridad para que "Contacto" no pegue al borde
     root.appendChild(spacer);
 
     // Sentinela
@@ -686,8 +686,8 @@ const App = () => {
       const pxToPdf = imgWidth / canvas.width;
       const pdfToPx = 1 / pxToPdf;
 
-      // Altura útil por página (con pie extra para evitar contacto con el borde)
-      const pageBottomPadding = 32;  // respiración visual extra
+      // Altura útil por página con “pie” extra
+      const pageBottomPadding = 32;
       const domPageHeight = pageHeight * pdfToPx - pageBottomPadding;
 
       // Construir anclas seguras
@@ -699,9 +699,9 @@ const App = () => {
         .sort((a, b) => a - b);
 
       // Reglas de salto
-      const margin = 56;       // margen superior al calcular el corte
-      const minAdvance = 140;  // no partir demasiado cerca del inicio
-      const firstLineGuard = 80; // bloquea cortes dentro de los primeros píxeles tras el inicio de una sección
+      const margin = 56;
+      const minAdvance = 140;
+      const firstLineGuard = 80; // evita cortes a pocos px del inicio de sección
 
       const isSectionTop = (y: number) => sectionAnchors.includes(y);
 
@@ -713,27 +713,19 @@ const App = () => {
 
         const lastPossibleStart = Math.max(0, canvas.height - domPageHeight);
 
-        // Preferir el ancla más alta <= limit, pero nunca dentro del "guard" del título
+        // Preferir ancla más alta ≤ limit, evitando caer dentro del "guard" de títulos
         let candidates = anchors.filter(v => v > last + minAdvance && v <= limit);
-
-        // Evitar cortes a pocos px del inicio de una sección
         candidates = candidates.filter(v => {
-          // Si v es una sección, perfecto; si no, validamos que no esté muy cerca del inicio de una sección
           const prevAnchor = anchors.find(a => a >= last && a <= v && isSectionTop(a));
           if (prevAnchor !== undefined && v - prevAnchor < firstLineGuard) return false;
           return true;
         });
 
         let next = candidates.length ? candidates[candidates.length - 1] : undefined;
-
-        if (next === undefined) {
-          // Busca el siguiente ancla >= limit
-          next = anchors.find(v => v >= limit);
-        }
+        if (next === undefined) next = anchors.find(v => v >= limit);
         if (next === undefined) next = lastPossibleStart;
         if (next > lastPossibleStart) next = lastPossibleStart;
 
-        // Asegurar avance real
         if (next <= last + minAdvance) next = Math.min(last + domPageHeight, lastPossibleStart);
         if (next <= last) break;
 
@@ -741,8 +733,9 @@ const App = () => {
       }
 
       // Normalizar y desduplicar
-      const uniqStarts = Array.from(new Set(starts.map(v => Math.max(0, Math.min(v, canvas.height - 1))))))
-        .sort((a, b) => a - b);
+      const uniqStarts = Array.from(
+        new Set(starts.map(v => Math.max(0, Math.min(v, canvas.height - 1)))))
+      ).sort((a, b) => a - b);
 
       // Render a PDF
       const imgData = canvas.toDataURL('image/png');
