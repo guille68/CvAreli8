@@ -273,7 +273,7 @@ const Navigation = ({
                 <span className="block">DELGADO</span>
               </h1>
 
-              {/* Desktop: botones */}
+              {/* Desktop */}
               <div className="mt-3 hidden lg:flex items-center justify-center gap-3">
                 <button
                   type="button"
@@ -302,7 +302,7 @@ const Navigation = ({
             </div>
           </div>
 
-          {/* MÓVIL: pegado a la derecha */}
+          {/* Móvil a la derecha */}
           <div className="lg:hidden absolute right-4 top-1/2 -translate-y-1/2 z-10 flex items-center gap-2">
             <button
               type="button"
@@ -606,9 +606,10 @@ const App = () => {
     return () => observer.disconnect();
   }, []);
 
+  // Permitir múltiples descargas
   const isDownloadingRef = useRef(false);
 
-  // --- DESCARGA PDF (ajustada para incluir Idiomas + Contacto completos) ---
+  // --- DESCARGA PDF (robusto para escritorio + iOS) ---
   const handleDownloadPDF = async () => {
     if (isDownloadingRef.current) return;
     isDownloadingRef.current = true;
@@ -616,22 +617,20 @@ const App = () => {
     const root = wrapperRef.current;
     if (!root) { isDownloadingRef.current = false; return; }
 
+    // Mostrar columna azul fija en desktop mientras se captura
     if (window.matchMedia('(min-width: 1024px)').matches) {
       document.body.classList.add('capture-pdf');
     }
 
+    // Asegurar top = 0
     window.scrollTo(0, 0);
 
-    // Sentinelas para garantizar el final y un pequeño colchón extra
+    // Sentinela para asegurar que el final se incluya
     const sentinel = document.createElement('div');
     sentinel.className = 'cv-break';
-    sentinel.style.cssText = 'width:1px;height:1px;';
+    sentinel.style.width = '1px';
+    sentinel.style.height = '1px';
     root.appendChild(sentinel);
-
-    const spacer = document.createElement('div');
-    spacer.className = 'cv-break';
-    spacer.style.cssText = 'height:320px;';
-    root.appendChild(spacer);
 
     // Expandir colapsables
     const collapsibles = Array.from(root.querySelectorAll<HTMLElement>('[data-collapsible-content="true"]'));
@@ -639,8 +638,9 @@ const App = () => {
     collapsibles.forEach((el) => { el.style.maxHeight = `${el.scrollHeight}px`; });
 
     try {
-      await new Promise((r) => setTimeout(r, 350));
+      await new Promise((r) => setTimeout(r, 250));
 
+      // Captura
       const totalWidth  = Math.max(root.scrollWidth,  root.offsetWidth,  root.clientWidth);
       const totalHeight = Math.max(root.scrollHeight, root.offsetHeight, root.clientHeight, document.documentElement.scrollHeight);
       const bg = getComputedStyle(root).backgroundColor || (isDark ? '#0b1220' : '#ffffff');
@@ -658,6 +658,7 @@ const App = () => {
         scrollY: 0,
       });
 
+      // Paginado
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'pt', 'a4');
       const pageWidth = pdf.internal.pageSize.getWidth();
@@ -667,7 +668,7 @@ const App = () => {
 
       const pxToPdf = imgWidth / canvas.width;
       const pdfToPx = 1 / pxToPdf;
-      const domPageHeight = pageHeight * pdfToPx - 12;
+      const domPageHeight = pageHeight * pdfToPx - 8;
 
       const rootRect = root.getBoundingClientRect();
       const anchorNodes = Array.from(root.querySelectorAll<HTMLElement>('.cv-section, .cv-break'));
@@ -676,8 +677,8 @@ const App = () => {
       const safeTops = Array.from(new Set(rawTops)).sort((a, b) => a - b);
 
       const starts: number[] = [0];
-      const margin = 48;
-      const minAdvance = 120;
+      const margin = 24;
+      const minAdvance = 96;
 
       while (true) {
         const last = starts[starts.length - 1];
@@ -685,7 +686,6 @@ const App = () => {
         if (limit >= canvas.height) break;
 
         const lastPossibleStart = Math.max(0, canvas.height - domPageHeight);
-
         const candidates = safeTops.filter(v => v > last + minAdvance && v <= limit);
         let next = candidates.length ? candidates[candidates.length - 1] : undefined;
 
@@ -710,14 +710,17 @@ const App = () => {
         pdf.addImage(imgData, 'PNG', 0, -startPx * pxToPdf, imgWidth, imgHeight);
       });
 
+      // Guardar
       const filename = 'CV_Areli_Aguilar.pdf';
       const ua = navigator.userAgent || '';
       const isIOS = /iPad|iPhone|iPod/.test(ua) || (/\bMacintosh\b/.test(ua) && 'ontouchend' in document);
 
       if (isIOS) {
+        // iOS: abrir en nueva pestaña para compartir/guardar
         const dataUrl = pdf.output('dataurlstring');
         window.open(dataUrl, '_blank');
       } else {
+        // ESCRITORIO/MÓVIL NO-iOS: click programático en <a download> (más confiable que pdf.save() en sandbox)
         const blob = pdf.output('blob');
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -731,9 +734,9 @@ const App = () => {
         });
       }
     } finally {
+      // Restaurar siempre, aún si hubo error
       collapsibles.forEach((el, i) => { el.style.maxHeight = prevHeights[i]; });
       document.body.classList.remove('capture-pdf');
-      spacer.remove();
       sentinel.remove();
       isDownloadingRef.current = false;
     }
