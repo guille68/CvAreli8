@@ -228,78 +228,6 @@ const ContactCard = ({
     <div className="block cursor-default">{inner}</div>
   );
 };
-// ================== CARDS (continuación) ==================
-const SkillsCard = ({
-  title,
-  icon,
-  iconColor,
-  children,
-}: {
-  title: string;
-  icon: ReactNode;
-  iconColor: string;
-  children: ReactNode;
-}) => (
-  <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 mb-4 border border-gray-200 dark:border-slate-700">
-    <div className="flex items-center mb-4">
-      <div className="mr-4 flex-shrink-0" style={{ color: iconColor }}>
-        {icon}
-      </div>
-      <h3 className="text-lg font-bold text-[#4a688b] dark:text-slate-100">
-        {title}
-      </h3>
-    </div>
-    {children}
-  </div>
-);
-
-const ContactCard = ({
-  icon,
-  label,
-  value,
-  href,
-}: {
-  icon: ReactNode;
-  label: string;
-  value: string;
-  href?: string;
-}) => {
-  const isLink = !!href;
-  const inner = (
-    <div
-      className={`cv-break bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 mb-4 border border-gray-200 dark:border-slate-700 transition-all duration-300 ${
-        isLink ? 'bg-gray-100/60 dark:bg-slate-700/40' : ''
-      }`}
-    >
-      <div className="flex items-start justify-between">
-        <div className="flex items-start">
-          <div className="mr-4 text-amber-600 mt-1 flex-shrink-0">
-            {icon}
-          </div>
-          <div>
-            <p className="text-sm font-semibold text-gray-500 dark:text-gray-300">
-              {label}
-            </p>
-            <p className="text-lg font-bold text-[#4a688b] dark:text-slate-100 break-words">
-              {value}
-            </p>
-          </div>
-        </div>
-        {isLink && (
-          <ArrowRight size={24} className="text-[#4a688b] dark:text-slate-100" />
-        )}
-      </div>
-    </div>
-  );
-
-  return isLink ? (
-    <a href={href} className="block" target="_blank" rel="noopener noreferrer">
-      {inner}
-    </a>
-  ) : (
-    <div className="block cursor-default">{inner}</div>
-  );
-};
 // ================== APP ==================
 const App = () => {
   const [activeSection, setActiveSection] = useState('perfil');
@@ -383,7 +311,7 @@ const App = () => {
     // Asegura tope al inicio
     window.scrollTo(0, 0);
 
-    // 0) Sentinela final para asegurar que se capture el último pixel (Contacto)
+    // Sentinela final para asegurar que se capture el último pixel (Contacto)
     const sentinel = document.createElement('div');
     sentinel.className = 'cv-break';
     sentinel.style.width = '1px';
@@ -429,7 +357,7 @@ const App = () => {
       scrollY: 0,
     });
 
-    // 3) Paginado "inteligente" (elige el ANCLA anterior para no cortar títulos/ítems)
+    // 3) Paginado "inteligente"
     const imgData = canvas.toDataURL('image/png');
     const pdf = new jsPDF('p', 'pt', 'a4');
     const pageWidth = pdf.internal.pageSize.getWidth();
@@ -439,9 +367,9 @@ const App = () => {
 
     const pxToPdf = imgWidth / canvas.width;
     const pdfToPx = 1 / pxToPdf;
-    const domPageHeight = pageHeight * pdfToPx - 8; // pequeño colchón contra redondeos
+    const domPageHeight = pageHeight * pdfToPx - 8; // colchón contra redondeos
 
-    // Todos los anclajes "seguros" para cortar
+    // Anclajes seguros para los cortes
     const rootRect = root.getBoundingClientRect();
     const anchorNodes = Array.from(
       root.querySelectorAll<HTMLElement>('.cv-section, .cv-break')
@@ -452,12 +380,12 @@ const App = () => {
         Math.round(n.getBoundingClientRect().top - rootRect.top + window.scrollY)
       )
     );
-    rawTops.push(0, canvas.height); // extremos siempre válidos
+    rawTops.push(0, canvas.height);
     const safeTops = Array.from(new Set(rawTops)).sort((a, b) => a - b);
 
     const starts: number[] = [0];
-    const margin = 24;      // evita cortar al ras del límite
-    const minAdvance = 96;  // mínimo avance por página
+    const margin = 24;
+    const minAdvance = 96;
 
     while (true) {
       const last = starts[starts.length - 1];
@@ -466,43 +394,38 @@ const App = () => {
 
       const lastPossibleStart = Math.max(0, canvas.height - domPageHeight);
 
-      // 3.a) Intentar el ANCLA anterior al límite (mejor para no cortar títulos)
+      // Preferir el ancla anterior al límite
       const candidates = safeTops.filter(
         (v) => v > last + minAdvance && v <= limit
       );
       let next =
         candidates.length > 0 ? candidates[candidates.length - 1] : undefined;
 
-      // 3.b) Si no hay candidato anterior, ir al siguiente >= límite
       if (next === undefined) {
         next = safeTops.find((v) => v >= limit);
       }
-
-      // 3.c) Asegurar que no nos pasamos del último posible
       if (next === undefined) next = lastPossibleStart;
       else if (next > lastPossibleStart) next = lastPossibleStart;
 
-      // 3.d) Últimas salvaguardas
-      if (next <= last + minAdvance) next = Math.min(last + domPageHeight, lastPossibleStart);
+      if (next <= last + minAdvance)
+        next = Math.min(last + domPageHeight, lastPossibleStart);
       if (next <= last) break;
 
       starts.push(Math.round(next));
     }
 
-    // Última página obligatoria si falta un resto mínimo
     const lastStart = starts[starts.length - 1];
     if (lastStart + domPageHeight < canvas.height) {
       starts.push(Math.max(0, Math.round(canvas.height - domPageHeight)));
     }
 
-    // Render de cada página
     const uniqStarts = Array.from(new Set(starts)).sort((a, b) => a - b);
     uniqStarts.forEach((startPx, idx) => {
       if (idx > 0) pdf.addPage();
       pdf.addImage(imgData, 'PNG', 0, -startPx * pxToPdf, imgWidth, imgHeight);
     });
 
-    // 4) Guardar (multi-uso, sin bloquear descargas posteriores)
+    // 4) Guardar (multi-uso)
     const filename = 'CV_Areli_Aguilar.pdf';
     const ua = navigator.userAgent || '';
     const isIOS =
@@ -511,11 +434,9 @@ const App = () => {
 
     try {
       if (isIOS) {
-        // iOS abre pestaña para compartir/guardar
         const dataUrl = pdf.output('dataurlstring');
         window.open(dataUrl, '_blank');
       } else {
-        // Escritorio (Chrome, etc.)
         pdf.save(filename);
       }
     } catch {
@@ -536,7 +457,7 @@ const App = () => {
       }
     }
 
-    // 5) Restaurar y permitir nuevas descargas
+    // 5) Restaurar
     collapsibles.forEach((el, i) => {
       el.style.maxHeight = prevHeights[i];
     });
@@ -555,7 +476,7 @@ const App = () => {
       .typing-cursor{display:inline-block;animation:blink-caret .75s step-end infinite;opacity:1}
       @keyframes blink-caret{from,to{opacity:0}50%{opacity:1}}
 
-      /* Carrusel en loop constante (sin huecos) */
+      /* Carrusel */
       @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
       .marquee-container{display:flex;height:100%;width:max-content;animation:marquee 30s linear infinite;will-change:transform}
       .marquee-container.paused{animation-play-state:paused}
@@ -563,7 +484,7 @@ const App = () => {
       @media (max-width:1023px){.marquee-item{font-size:.95rem;padding:0 1rem}}
       .marquee-item .icon{color:#d97706;margin-right:.5rem;display:inline-block;vertical-align:middle}
 
-      /* Chips de Competencias */
+      /* Chips Competencias */
       .skill-chip{background-color:#e5e7eb;color:#374151;border:1px solid #d1d5db}
       .dark .skill-chip{background-color:#334155;color:#f8fafc;border-color:#475569}
       .dark .competencia-btn{color:#fff!important;background-color:rgba(255,255,255,.08)}
@@ -790,3 +711,4 @@ const App = () => {
 };
 
 export default App;
+
