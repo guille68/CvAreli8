@@ -625,6 +625,13 @@ const App = () => {
     // Asegurar top = 0
     window.scrollTo(0, 0);
 
+    // === Spacer final requerido por especificación (temporal durante captura) ===
+    const spacer = document.createElement('div');
+    spacer.className = 'cv-break';
+    spacer.style.width = '1px';
+    spacer.style.height = '320px';
+    root.appendChild(spacer);
+
     // Sentinela para asegurar que el final se incluya
     const sentinel = document.createElement('div');
     sentinel.className = 'cv-break';
@@ -668,7 +675,7 @@ const App = () => {
 
       const pxToPdf = imgWidth / canvas.width;
       const pdfToPx = 1 / pxToPdf;
-      const domPageHeight = pageHeight * pdfToPx - 8;
+      const domPageHeight = pageHeight * pdfToPx - 12; // margen interno fino para evitar cortes
 
       const rootRect = root.getBoundingClientRect();
       const anchorNodes = Array.from(root.querySelectorAll<HTMLElement>('.cv-section, .cv-break'));
@@ -676,9 +683,10 @@ const App = () => {
       rawTops.push(0, canvas.height);
       const safeTops = Array.from(new Set(rawTops)).sort((a, b) => a - b);
 
+      // Ajuste según especificación (márgenes seguros)
       const starts: number[] = [0];
-      const margin = 24;
-      const minAdvance = 96;
+      const margin = 48;       // <- estándar de tu prompt
+      const minAdvance = 120;  // <- estándar de tu prompt
 
       while (true) {
         const last = starts[starts.length - 1];
@@ -716,11 +724,9 @@ const App = () => {
       const isIOS = /iPad|iPhone|iPod/.test(ua) || (/\bMacintosh\b/.test(ua) && 'ontouchend' in document);
 
       if (isIOS) {
-        // iOS: abrir en nueva pestaña para compartir/guardar
         const dataUrl = pdf.output('dataurlstring');
         window.open(dataUrl, '_blank');
       } else {
-        // ESCRITORIO/MÓVIL NO-iOS: click programático en <a download> (más confiable que pdf.save() en sandbox)
         const blob = pdf.output('blob');
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -735,9 +741,13 @@ const App = () => {
       }
     } finally {
       // Restaurar siempre, aún si hubo error
-      collapsibles.forEach((el, i) => { el.style.maxHeight = prevHeights[i]; });
+      const rootNow = wrapperRef.current;
+      if (rootNow) {
+        collapsibles.forEach((el, i) => { el.style.maxHeight = prevHeights[i]; });
+        sentinel.remove();
+        spacer.remove();
+      }
       document.body.classList.remove('capture-pdf');
-      sentinel.remove();
       isDownloadingRef.current = false;
     }
   };
