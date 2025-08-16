@@ -567,19 +567,19 @@ const App = () => {
   const [activeSection, setActiveSection] = useState('perfil');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Tema claro/oscuro (sin parpadeo)
+  // Tema claro/oscuro (default a CLARO; si localStorage==='dark', entonces oscuro)
   const getInitialDark = () => {
     try {
       const saved = localStorage.getItem('theme');
-      if (saved) return saved === 'dark';
-      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      return saved === 'dark'; // por defecto false (claro)
     } catch { return false; }
   };
   const [isDark, setIsDark] = useState<boolean>(getInitialDark());
+  // Evitar parpadeo: aplica clase al cargar según localStorage (sin consultar media)
   useLayoutEffect(() => {
-    const saved = (() => { try { return localStorage.getItem('theme'); } catch { return null; } })();
-    const initialDark = saved ? saved === 'dark' : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    document.documentElement.classList.toggle('dark', initialDark);
+    let isDarkInitial = false;
+    try { isDarkInitial = localStorage.getItem('theme') === 'dark'; } catch {}
+    document.documentElement.classList.toggle('dark', isDarkInitial);
   }, []);
   useEffect(() => {
     document.documentElement.classList.toggle('dark', isDark);
@@ -620,7 +620,7 @@ const App = () => {
     return y;
   };
 
-  // --- DESCARGA PDF (robusto para escritorio + iOS) ---
+  // --- DESCARGA PDF (robusto escritorio + iOS) ---
   const handleDownloadPDF = async () => {
     if (isDownloadingRef.current) return;
     isDownloadingRef.current = true;
@@ -636,14 +636,14 @@ const App = () => {
     // Asegurar top = 0
     window.scrollTo(0, 0);
 
-    // Spacer final (respira el pie y asegura captura completa)
+    // Spacer final (aire al pie, evita que "Contacto" pegue al borde)
     const spacer = document.createElement('div');
     spacer.className = 'cv-break';
     spacer.style.width = '1px';
     spacer.style.height = '340px';
     root.appendChild(spacer);
 
-    // Sentinela
+    // Sentinela final
     const sentinel = document.createElement('div');
     sentinel.className = 'cv-break';
     sentinel.style.width = '1px';
@@ -676,7 +676,7 @@ const App = () => {
         scrollY: 0,
       });
 
-      // ===== Paginado mejorado (sin duplicados, títulos intactos) =====
+      // ===== Paginado determinista por rangos (sin solapes/duplicados) =====
       const pdf = new jsPDF('p', 'pt', 'a4');
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
@@ -690,7 +690,7 @@ const App = () => {
       const pageBottomPadding = 32;
       const domPageHeight = pageHeight * pdfToPx - pageBottomPadding;
 
-      // Construir anclas seguras
+      // Anclas seguras (secciones + cv-break)
       const sectionAnchors = Array.from(root.querySelectorAll<HTMLElement>('.cv-section'))
         .map(n => Math.max(0, Math.round(getOffsetTop(n, root))));
       const breakAnchors = Array.from(root.querySelectorAll<HTMLElement>('.cv-break'))
@@ -698,42 +698,47 @@ const App = () => {
       const anchors = Array.from(new Set([0, ...sectionAnchors, ...breakAnchors, canvas.height]))
         .sort((a, b) => a - b);
 
-      // Reglas de salto
-      const margin = 56;
-      const minAdvance = 140;
-      const firstLineGuard = 80; // evita cortes a pocos px del inicio de sección
-
+      // Reglas
+      const margin = 56;          // margen top para evitar cortes pegados al borde
+      const minAdvance = 140;     // avance mínimo para que no se parta un bloque reciente
+      const titleGuard = 80;      // evita cortar inmediatamente después del encabezado de sección
       const isSectionTop = (y: number) => sectionAnchors.includes(y);
 
-      const starts: number[] = [0];
-      while (true) {
-        const last = starts[starts.length - 1];
-        const limit = last + domPageHeight - margin;
-        if (limit >= canvas.height) break;
+      // Construcción de páginas por [start, end)
+      const starts: number[] = [];
+      let start = 0;
+      const maxY = canvas.height;
 
-        const lastPossibleStart = Math.max(0, canvas.height - domPageHeight);
+      while (start < maxY - 1) {
+        starts.push(start);
 
-        // Preferir ancla más alta ≤ limit, evitando caer dentro del "guard" de títulos
-        let candidates = anchors.filter(v => v > last + minAdvance && v <= limit);
-        candidates = candidates.filter(v => {
-          const prevAnchor = anchors.find(a => a >= last && a <= v && isSectionTop(a));
-          if (prevAnchor !== undefined && v - prevAnchor < firstLineGuard) return false;
+        const limit = start + domPageHeight - margin;
+        if (limit >= maxY) break;
+
+        // candidatos dentro del rango, respetando guardas de título
+        let candidates = anchors.filter(y => y > start + minAdvance && y <= limit);
+        candidates = candidates.filter(y => {
+          const lastSectionTop = anchors.find(a => a >= start && a <= y && isSectionTop(a));
+          if (lastSectionTop !== undefined && y - lastSectionTop < titleGuard) return false;
           return true;
         });
 
-        let next = candidates.length ? candidates[candidates.length - 1] : undefined;
-        if (next === undefined) next = anchors.find(v => v >= limit);
-        if (next === undefined) next = lastPossibleStart;
-        if (next > lastPossibleStart) next = lastPossibleStart;
+        // elegir el corte más alto posible dentro del límite; si no, el siguiente anchor ≥ limit
+        let end = candidates.length ? candidates[candidates.length - 1] : anchors.find(y => y >= limit) ?? maxY;
 
-        if (next <= last + minAdvance) next = Math.min(last + domPageHeight, lastPossibleStart);
-        if (next <= last) break;
+        // garantía de avance real
+        if (end <= start + minAdvance) {
+          // intenta saltar al próximo anchor que garantice avance suficiente
+          const nextEnough = anchors.find(y => y >= start + minAdvance);
+          end = nextEnough !== undefined ? nextEnough : Math.min(start + domPageHeight, maxY);
+        }
 
-        starts.push(Math.round(next));
+        // avanzar exactamente al siguiente inicio (sin solapes -> sin duplicados)
+        start = Math.min(end, maxY);
       }
 
       // Normalizar y desduplicar
-      const uniqStarts = Array.from(new Set(starts.map(v => Math.max(0, Math.min(v, canvas.height - 1))))).sort((a, b) => a - b);
+      const uniqStarts = Array.from(new Set(starts.map(v => Math.max(0, Math.min(v, maxY - 1))))).sort((a, b) => a - b);
 
       // Render a PDF
       const imgData = canvas.toDataURL('image/png');
@@ -917,6 +922,7 @@ const App = () => {
 };
 
 export default App;
+
 
 
 
