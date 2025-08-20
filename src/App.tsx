@@ -4,11 +4,10 @@ import {
   BarChart, Gem, Lightbulb, Info, Settings, Bot, Handshake, BookOpen, Flag, LayoutDashboard,
   CheckCircle, HeartHandshake, Phone, Mail, Linkedin, ArrowRight, Sun, Moon, Download
 } from 'lucide-react';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 
 // ================== DATA ==================
 const portfolioData = {
+  name: 'ARELI AGUILAR DELGADO',
   profile: [
     { icon: <Briefcase size={24} />, text: 'Ejecutiva bilingüe (inglés/español) con más de 20 años de experiencia en desarrollo de negocios, gestión estratégica de proyectos y análisis de información clave para la toma de decisiones de alta dirección.' },
     { icon: <Settings size={24} />, text: 'Mi trayectoria combina habilidades avanzadas en planeación y gestión administrativa con una visión estratégica orientada a la transformación digital. Integro tecnologías emergentes - incluida la inteligencia artificial- para modernizar procesos, fortalecer la gestión empresarial y optimizar la toma de decisiones, impulsando la eficiencia operativa y la identificación de oportunidades estratégicas.' },
@@ -176,7 +175,7 @@ const MarqueeCarousel = () => {
 
   return (
     <div
-      className="bg-transparent overflow-hidden h-12 w-full mt-6 marquee-container-wrapper flex items-center"
+      className="bg-transparent overflow-hidden h-12 w-full mt-6 marquee-container-wrapper flex items-center print-hide"
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
@@ -258,7 +257,7 @@ const Navigation = ({
   ];
 
   return (
-    <nav className="app-nav fixed lg:left-0 top-0 w-full lg:w-80 h-16 lg:h-screen bg-[#1e2a38] text-gray-200 shadow-2xl z-50">
+    <nav className="app-nav fixed lg:left-0 top-0 w-full lg:w-80 h-16 lg:h-screen bg-[#1e2a38] text-gray-200 shadow-2xl z-50 lg:overflow-y-auto print-hide">
       <div className="container mx-auto px-4 lg:px-0 h-full flex items-center justify-between lg:block">
         <div className="relative w-full flex items-center lg:block lg:py-8">
           <div className="flex items-center lg:flex-col lg:items-center lg:text-center pr-32 lg:pr-0">
@@ -273,7 +272,7 @@ const Navigation = ({
                 <span className="block">DELGADO</span>
               </h1>
 
-              {/* Desktop */}
+              {/* Desktop */} 
               <div className="mt-3 hidden lg:flex items-center justify-center gap-3">
                 <button
                   type="button"
@@ -302,7 +301,7 @@ const Navigation = ({
             </div>
           </div>
 
-          {/* Móvil a la derecha */}
+          {/* Móvil a la derecha */} 
           <div className="lg:hidden absolute right-4 top-1/2 -translate-y-1/2 z-10 flex items-center gap-2">
             <button
               type="button"
@@ -364,22 +363,15 @@ const Navigation = ({
 
 // ================== SECCIÓN GENÉRICA ==================
 const Section = forwardRef(
-  ({ id, title, children }: { id: string; title: string; children: ReactNode }, ref: any) => {
-    const isExpandableSection = id === 'experiencia' || id === 'proyectos';
+  ({ id, title, children, noBreak }: { id: string; title: string; children: ReactNode, noBreak?: boolean }, ref: any) => {
     return (
       <section
         id={id}
         ref={ref}
-        className="cv-section bg-white dark:bg-slate-900/60 p-4 sm:p-6 md:p-8 rounded-2xl shadow-xl mb-12 transform hover:scale-[1.01] transition-transform duration-300"
+        className={`cv-section bg-white dark:bg-slate-900/60 p-4 sm:p-6 md:p-8 rounded-2xl shadow-xl mb-12 transform hover:scale-[1.01] transition-transform duration-300 ${!noBreak ? 'print-avoid-break' : ''}`}
       >
-        <div className="flex items-center gap-4 mb-6 border-b pb-4 border-amber-600">
+        <div className="flex items-center gap-4 mb-6 border-b pb-4 border-amber-600 print-avoid-after">
           <h2 className="text-2xl sm:text-3xl font-bold text-[#4a688b] dark:text-[#93c5fd] font-sans">{title}</h2>
-          {isExpandableSection && (
-            <div className="flex items-center text-gray-500 dark:text-gray-300 ml-2">
-              <Info size={16} className="mr-1" />
-              <p className="text-sm font-medium">Presiona cada contenedor para desplegar información</p>
-            </div>
-          )}
         </div>
         {children}
       </section>
@@ -401,11 +393,11 @@ const CollapsibleExperience = ({ date, title, company, location, description, ic
   }, [isOpen]);
 
   return (
-    <div className="cv-break bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden mb-4 border border-gray-200 dark:border-slate-700">
+    <div className="print-avoid-break bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden mb-4 border border-gray-200 dark:border-slate-700">
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex justify-between items-center p-4 sm:p-6 text-left transition-colors duration-200 hover:bg-gray-50 dark:hover:bg-slate-700/40 focus:outline-none"
+        className="w-full flex justify-between items-center p-4 sm:p-6 text-left transition-colors duration-200 hover:bg-gray-50 dark:hover:bg-slate-700/40 focus:outline-none print-hide"
       >
         <div className="flex items-start">
           <div className="mr-4 text-amber-600 flex-shrink-0">{icon}</div>
@@ -421,11 +413,35 @@ const CollapsibleExperience = ({ date, title, company, location, description, ic
         </svg>
       </button>
 
-      <div ref={contentRef} data-collapsible-content="true" className="overflow-hidden transition-[max-height] duration-500 ease-in-out" style={{ maxHeight: '0px' }}>
+      {/* Contenido para la web */} 
+      <div ref={contentRef} data-collapsible-content="true" className="overflow-hidden transition-[max-height] duration-500 ease-in-out print-hide" style={{ maxHeight: '0px' }}>
         <div className="px-6 pb-6 pt-2 border-t border-gray-200 dark:border-slate-700">
           <ul className="list-none space-y-2">
             {description.map((item, index) => (
-              <li key={index} className="cv-break flex items-start text-gray-700 dark:text-gray-200">
+              <li key={index} className="flex items-start text-gray-700 dark:text-gray-200">
+                <span className="text-amber-600 mr-2 flex-shrink-0">&rarr;</span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      {/* Contenido visible solo en impresión */} 
+      <div className="hidden print-show p-4 sm:p-6">
+        <div className="flex items-start">
+            <div className="mr-4 text-amber-600 flex-shrink-0">{icon}</div>
+            <div>
+              <h3 className="text-lg font-bold text-[#4a688b] dark:text-slate-100">{title}</h3>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-300">{date}</p>
+              {company && <p className="text-sm text-gray-500 italic dark:text-gray-300">{company}</p>}
+              {location && <p className="text-sm text-gray-500 dark:text-gray-300">{location}</p>}
+            </div>
+        </div>
+        <div className="px-6 pb-6 pt-2 mt-4 border-t border-gray-200 dark:border-slate-700">
+          <ul className="list-none space-y-2">
+            {description.map((item, index) => (
+              <li key={index} className="flex items-start text-gray-700 dark:text-gray-200">
                 <span className="text-amber-600 mr-2 flex-shrink-0">&rarr;</span>
                 <span>{item}</span>
               </li>
@@ -439,7 +455,7 @@ const CollapsibleExperience = ({ date, title, company, location, description, ic
 
 // ================== CARDS ==================
 const ProfileCard = ({ icon, text }: { icon: ReactNode; text: string }) => (
-  <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 mb-4 border border-gray-200 dark:border-slate-700">
+  <div className="print-avoid-break bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 mb-4 border border-gray-200 dark:border-slate-700">
     <div className="flex items-start">
       <div className="mr-4 text-[#4a688b] dark:text-[#93c5fd] mt-1 flex-shrink-0">{icon}</div>
       <p className="text-gray-800 dark:text-gray-100 text-base sm:text-lg leading-relaxed">{text}</p>
@@ -450,7 +466,7 @@ const ProfileCard = ({ icon, text }: { icon: ReactNode; text: string }) => (
 const EducationCard = ({ icon, iconColor, title, period, description }: {
   icon: ReactNode; iconColor: string; title: string; period: string; description: string | string[];
 }) => (
-  <div className="cv-break bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 mb-4 border border-gray-200 dark:border-slate-700">
+  <div className="print-avoid-break bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 mb-4 border border-gray-200 dark:border-slate-700">
     <div className="flex items-start">
       <div className="mr-4 flex-shrink-0" style={{ color: iconColor }}>{icon}</div>
       <div>
@@ -459,7 +475,7 @@ const EducationCard = ({ icon, iconColor, title, period, description }: {
         {Array.isArray(description) ? (
           <ul className="list-none space-y-2">
             {description.map((item, index) => (
-              <li key={index} className="cv-break flex items-start text-gray-700 dark:text-gray-200">
+              <li key={index} className="flex items-start text-gray-700 dark:text-gray-200">
                 <span className="text-amber-600 mr-2 flex-shrink-0">&rarr;</span>
                 <span>{item}</span>
               </li>
@@ -474,11 +490,11 @@ const EducationCard = ({ icon, iconColor, title, period, description }: {
 );
 
 const OtherStudies = ({ items }: { items: string[] }) => (
-  <div className="cv-break bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 mb-4 border border-gray-200 dark:border-slate-700">
+  <div className="print-avoid-break bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 mb-4 border border-gray-200 dark:border-slate-700">
     <h3 className="text-lg font-bold text-[#4a688b] dark:text-slate-100 mb-2">Otros estudios:</h3>
     <ul className="list-none space-y-2">
       {items.map((item, index) => (
-        <li key={index} className="cv-break flex items-start text-gray-700 dark:text-gray-200">
+        <li key={index} className="print-avoid-break flex items-start text-gray-700 dark:text-gray-200">
           <BookOpen className="mr-2 flex-shrink-0 text-amber-600" size={20} />
           <span>{item}</span>
         </li>
@@ -488,7 +504,7 @@ const OtherStudies = ({ items }: { items: string[] }) => (
 );
 
 const LanguageCard = ({ language, proficiency }: { language: string; proficiency: string }) => (
-  <div className="cv-break bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 border border-gray-200 dark:border-slate-700 flex-1 min-w-[150px] transition-all duration-300 hover:shadow-lg">
+  <div className="print-avoid-break bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 border border-gray-200 dark:border-slate-700 flex-1 min-w-[150px] transition-all duration-300 hover:shadow-lg">
     <div className="flex items-center">
       <Flag className="w-6 h-6 mr-4 flex-shrink-0 text-amber-600" />
       <div>
@@ -499,18 +515,8 @@ const LanguageCard = ({ language, proficiency }: { language: string; proficiency
   </div>
 );
 
-const SkillsCard = ({
-  title,
-  icon,
-  iconColor,
-  children,
-}: {
-  title: string;
-  icon: ReactNode;
-  iconColor: string;
-  children: ReactNode;
-}) => (
-  <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 mb-4 border border-gray-200 dark:border-slate-700">
+const SkillsCard = ({ title, icon, iconColor, children }: { title: string; icon: ReactNode; iconColor: string; children: ReactNode; }) => (
+  <div className="print-avoid-break bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 mb-4 border border-gray-200 dark:border-slate-700">
     <div className="flex items-center mb-4">
       <div className="mr-4 flex-shrink-0" style={{ color: iconColor }}>
         {icon}
@@ -521,23 +527,11 @@ const SkillsCard = ({
   </div>
 );
 
-const ContactCard = ({
-  icon,
-  label,
-  value,
-  href,
-}: {
-  icon: ReactNode;
-  label: string;
-  value: string;
-  href?: string;
-}) => {
+const ContactCard = ({ icon, label, value, href }: { icon: ReactNode; label: string; value: string; href?: string; }) => {
   const isLink = !!href;
   const inner = (
     <div
-      className={`cv-break bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 mb-4 border border-gray-200 dark:border-slate-700 transition-all duration-300 ${
-        isLink ? 'bg-gray-100/60 dark:bg-slate-700/40' : ''
-      }`}
+      className={`print-avoid-break bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 mb-4 border border-gray-200 dark:border-slate-700 transition-all duration-300 ${isLink ? 'bg-gray-100/60 dark:bg-slate-700/40' : ''}`}
     >
       <div className="flex items-start justify-between">
         <div className="flex items-start">
@@ -551,7 +545,9 @@ const ContactCard = ({
             </p>
           </div>
         </div>
-        {isLink && <ArrowRight size={24} className="text-[#4a688b] dark:text-slate-100" />}
+        <div className="print-hide">
+          {isLink && <ArrowRight size={24} className="text-[#4a688b] dark:text-slate-100" />}
+        </div>
       </div>
     </div>
   );
@@ -586,7 +582,6 @@ const App = () => {
   const toggleDark = () => setIsDark(d => !d);
 
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
-  const wrapperRef = useRef<HTMLDivElement | null>(null);
 
   const handleNavigate = (sectionId: string) => {
     const el = sectionRefs.current[sectionId];
@@ -597,183 +592,26 @@ const App = () => {
   // Activo en menú
   useEffect(() => {
     const observer = new IntersectionObserver(
-      (entries) => entries.forEach((e) => e.isIntersecting && setActiveSection(e.target.id)),
-      { threshold: 0.3, rootMargin: '-20px 0px -50% 0px' }
+      (entries) => {
+        const visibleSections = entries.filter((e) => e.isIntersecting);
+        if (visibleSections.length > 0) {
+          visibleSections.sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+          setActiveSection(visibleSections[0].target.id);
+        }
+      },
+      { threshold: 0, rootMargin: '0px 0px -80% 0px' }
     );
     Object.values(sectionRefs.current).forEach((s) => s && observer.observe(s));
     return () => observer.disconnect();
   }, []);
 
-  // Permitir múltiples descargas
-  const isDownloadingRef = useRef(false);
-
-  // Utilidad: offset relativo al contenedor raíz
-  const getOffsetTop = (el: HTMLElement, root: HTMLElement) => {
-    let y = 0;
-    let node: HTMLElement | null = el;
-    while (node && node !== root) {
-      y += node.offsetTop;
-      node = node.offsetParent as HTMLElement | null;
-    }
-    return y;
-  };
-
-  // --- DESCARGA PDF (sin duplicados; cortes limpios) ---
-  const handleDownloadPDF = async () => {
-    if (isDownloadingRef.current) return;
-    isDownloadingRef.current = true;
-
-    const root = wrapperRef.current;
-    if (!root) { isDownloadingRef.current = false; return; }
-
-    // Mostrar franja azul fija en desktop mientras se captura
-    if (window.matchMedia('(min-width: 1024px)').matches) {
-      document.body.classList.add('capture-pdf');
-    }
-
-    // Ir al tope
-    window.scrollTo(0, 0);
-
-    // Spacer (aire al final) + sentinel
-    const spacer = document.createElement('div');
-    spacer.className = 'cv-break';
-    spacer.style.width = '1px';
-    spacer.style.height = '420px';
-    root.appendChild(spacer);
-
-    const sentinel = document.createElement('div');
-    sentinel.className = 'cv-break';
-    sentinel.style.width = '1px';
-    sentinel.style.height = '1px';
-    root.appendChild(sentinel);
-
-    // Expandir colapsables
-    const collapsibles = Array.from(root.querySelectorAll('[data-collapsible-content="true"]')) as HTMLElement[];
-    const prevHeights = collapsibles.map((el) => el.style.maxHeight);
-    collapsibles.forEach((el) => { el.style.maxHeight = `${el.scrollHeight}px`; });
-
-    try {
-      await new Promise((r) => setTimeout(r, 250));
-
-      // Captura DOM completa
-      const totalWidth  = Math.max(root.scrollWidth,  root.offsetWidth,  root.clientWidth);
-      const totalHeight = Math.max(root.scrollHeight, root.offsetHeight, root.clientHeight, document.documentElement.scrollHeight);
-      const bg = getComputedStyle(root).backgroundColor || (isDark ? '#0b1220' : '#ffffff');
-
-      const canvas = await html2canvas(root, {
-        scale: 2,
-        useCORS: true,
-        allowTaint: false,
-        backgroundColor: bg,
-        windowWidth: totalWidth,
-        windowHeight: totalHeight,
-        width: totalWidth,
-        height: totalHeight,
-        scrollX: 0,
-        scrollY: 0,
-      });
-
-      // ===== Paginado por rangos + SLICING real del canvas =====
-      const pdf = new jsPDF('p', 'pt', 'a4');
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-
-      const pxToPdf = pageWidth / canvas.width;          // escala horizontal
-      const pdfToPx = 1 / pxToPdf;
-
-      // Altura útil en pixels DOM por página (con padding inferior)
-      const pageBottomPadding = 32;
-      const domPageHeight = pageHeight * pdfToPx - pageBottomPadding;
-
-      // Anclas seguras
-      const sectionEls = Array.from(root.querySelectorAll('.cv-section')) as HTMLElement[];
-      const breakEls   = Array.from(root.querySelectorAll('.cv-break')) as HTMLElement[];
-      const sectionAnchors = sectionEls.map(n => Math.max(0, Math.round(getOffsetTop(n, root))));
-      const breakAnchors   = breakEls.map(n => Math.max(0, Math.round(getOffsetTop(n, root))));
-      const anchors = Array.from(new Set([0, ...sectionAnchors, ...breakAnchors, canvas.height])).sort((a, b) => a - b);
-      const isSectionTop = (y: number) => sectionAnchors.includes(y);
-
-      // Reglas de corte
-      const margin = 56;
-      const minAdvance = 140;
-      const titleGuard = 80;
-
-      // Construimos cortes como pares [start, end)
-      const cuts: Array<[number, number]> = [];
-      let start = 0;
-      const maxY = canvas.height;
-
-      while (start < maxY - 1) {
-        const limit = Math.min(maxY, start + domPageHeight - margin);
-
-        // candidatos ≤ limit y con guardas para no partir encabezados
-        let candidates = anchors.filter(y => y > start + minAdvance && y <= limit);
-        candidates = candidates.filter(y => {
-          const lastSectionTop = anchors.find(a => a >= start && a <= y && isSectionTop(a));
-          if (lastSectionTop !== undefined && y - lastSectionTop < titleGuard) return false;
-          return true;
-        });
-
-        let end = candidates.length ? candidates[candidates.length - 1] : anchors.find(y => y >= limit) ?? maxY;
-        if (end <= start + minAdvance) end = Math.min(start + domPageHeight, maxY);
-        if (end <= start) break;
-
-        cuts.push([start, end]);
-        start = end;
-      }
-
-      // Render: recortar cada rango a un canvas parcial (sin solapes -> sin duplicados)
-      cuts.forEach(([from, to], idx) => {
-        const sliceH = to - from;
-        const sliceCanvas = document.createElement('canvas');
-        sliceCanvas.width = canvas.width;
-        sliceCanvas.height = sliceH;
-
-        const ctx = sliceCanvas.getContext('2d')!;
-        ctx.drawImage(canvas, 0, from, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
-
-        const imgData = sliceCanvas.toDataURL('image/png');
-        const imgW = pageWidth;
-        const imgH = (sliceH * imgW) / canvas.width; // respeta proporción
-
-        if (idx > 0) pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, 0, imgW, imgH);
-      });
-
-      // Guardar
-      const filename = 'CV_Areli_Aguilar.pdf';
-      const ua = navigator.userAgent || '';
-      const isIOS = /iPad|iPhone|iPod/.test(ua) || (/\bMacintosh\b/.test(ua) && 'ontouchend' in document);
-
-      if (isIOS) {
-        const dataUrl = pdf.output('dataurlstring');
-        window.open(dataUrl, '_blank');
-      } else {
-        const blob = pdf.output('blob');
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        requestAnimationFrame(() => {
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-        });
-      }
-    } finally {
-      // Restaurar siempre
-      collapsibles.forEach((el, i) => { el.style.maxHeight = prevHeights[i]; });
-      document.body.classList.remove('capture-pdf');
-      sentinel.remove();
-      spacer.remove();
-      isDownloadingRef.current = false;
-    }
+  // --- DESCARGA PDF (NUEVA IMPLEMENTACIÓN SIMPLIFICADA) ---
+  const handleDownloadPDF = () => {
+    window.print();
   };
 
   return (
     <div
-      ref={wrapperRef}
       id="cv-container"
       className="min-h-screen bg-gray-50 dark:bg-[#0b1220] font-sans antialiased text-gray-800 dark:text-gray-100"
     >
@@ -794,10 +632,76 @@ const App = () => {
       .dark .competencia-btn:hover{background-color:rgba(255,255,255,.16)}
       .tooltip-content{background-color:#a8c0d9;color:#0f172a;border:1px solid #93a8c3}
       .dark .tooltip-content{background-color:#475569;color:#fff;border:1px solid #94A3B8}
+      
+      .print-show { display: none; }
 
-      @media (min-width:1024px){
-        .capture-pdf .app-nav::after{
-          content:"";position:fixed;left:0;top:0;width:20rem;height:20000px;background:#1e2a38;z-index:-1
+      /* --- PRINT STYLES --- */
+      @media print {
+        @page {
+          size: A4;
+          margin: 2mm 4mm 2mm 4mm;
+        }
+        
+        body {
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+        }
+
+        .print-hide {
+          display: none !important;
+        }
+        
+        .print-show {
+          display: block !important;
+        }
+
+        .print-header {
+            text-align: center;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #d97706;
+            padding-bottom: 0.5rem;
+        }
+
+        .dark {
+          background-color: white !important;
+          color: black !important;
+        }
+
+        #cv-container {
+          background-color: white !important;
+          color: #1f2937 !important;
+        }
+        
+        main.lg\:ml-80 {
+          margin-left: 0 !important;
+          padding: 0 !important;
+        }
+
+        .cv-section {
+          box-shadow: none !important;
+          border: 1px solid #e5e7eb !important;
+          transform: none !important;
+        }
+
+        .print-avoid-break {
+          break-inside: avoid;
+          page-break-inside: avoid;
+        }
+        
+        .print-avoid-after {
+          break-after: avoid;
+          page-break-after: avoid;
+        }
+
+        /* Ensure dark mode styles are overridden for printing */
+        .dark .bg-slate-900\/60, .dark .bg-slate-800, .dark .bg-\[\#0b1220\] {
+            background-color: white !important;
+        }
+        .dark .text-slate-100, .dark .text-gray-100, .dark .text-gray-200, .dark .text-gray-300, .dark .text-\[\#93c5fd\] {
+            color: #1f2937 !important;
+        }
+        .dark .border-slate-700 {
+            border-color: #e5e7eb !important;
         }
       }
       `}</style>
@@ -812,8 +716,8 @@ const App = () => {
         onDownloadPDF={handleDownloadPDF}
       />
 
-      {/* Carrusel + título móvil */}
-      <div className="pt-16 lg:pt-0 lg:ml-80">
+      {/* Carrusel + título móvil */} 
+      <div className="pt-16 lg:pt-0 lg:ml-80 print-hide">
         <MarqueeCarousel />
         <div className="px-4 pt-2 block lg:hidden">
           <TypingEffect text="CURRICULUM VITAE" />
@@ -821,13 +725,22 @@ const App = () => {
       </div>
 
       <main className="lg:ml-80 p-6 lg:p-8">
+        <div className="print-header print-show">
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', letterSpacing: '0.05em', color: '#4a688b', margin: '0 0 8px 0', textTransform: 'uppercase' }}>
+                CURRICULUM VITAE
+            </h2>
+            <h1 style={{ fontSize: '2rem', fontWeight: 700, color: '#1e2a38', margin: 0, lineHeight: 1.1, textTransform: 'uppercase' }}>
+                {portfolioData.name}
+            </h1>
+        </div>
+
         <Section ref={(el) => (sectionRefs.current.perfil = el)} id="perfil" title="Perfil Profesional">
           {portfolioData.profile.map((item, index) => (
             <ProfileCard key={index} icon={item.icon} text={item.text} />
           ))}
         </Section>
 
-        <Section ref={(el) => (sectionRefs.current.habilidades = el)} id="habilidades" title="Habilidades Destacadas">
+        <Section ref={(el) => (sectionRefs.current.habilidades = el)} id="habilidades" title="Habilidades Destacadas" noBreak>
           <div className="space-y-6">
             <SkillsCard title="Experiencia Ejecutiva" icon={<Briefcase size={24} />} iconColor="#d97706">
               <p className="text-gray-700 dark:text-gray-200">Más de 15 años de experiencia realizando gestiones administrativas clave a nivel ejecutivo para la alta dirección.</p>
@@ -845,15 +758,17 @@ const App = () => {
             </SkillsCard>
 
             <SkillsCard title="Competencias" icon={<Gem size={24} />} iconColor="#d97706">
-              <p className="text-gray-700 dark:text-gray-200 mb-4">- Desliza el cursor sobre cada competencia para conocer más detalles.</p>
+              <p className="text-gray-700 dark:text-gray-200 mb-4 print-hide">- Desliza el cursor sobre cada competencia para conocer más detalles.</p>
               <div className="flex flex-wrap gap-2">
                 {Object.entries(portfolioData.skills.tooltips).map(([label, tooltip], idx) => (
                   <div key={idx} className="relative group">
                     <span className="skill-chip competencia-btn px-3 py-1 rounded-full text-sm cursor-help group-hover:shadow-md transition">
                       {label}
-                      <Info size={12} className="inline-block ml-1 opacity-60 group-hover:opacity-100 transition-opacity" />
+                      <span className="print-hide">
+                        <Info size={12} className="inline-block ml-1 opacity-60 group-hover:opacity-100 transition-opacity" />
+                      </span>
                     </span>
-                    <div className="tooltip-content absolute z-10 hidden group-hover:block font-medium text-xs p-3 shadow-xl rounded-md w-64 top-full mt-1 left-1/2 -translate-x-1/2">
+                    <div className="tooltip-content absolute z-10 hidden group-hover:block font-medium text-xs p-3 shadow-xl rounded-md w-64 top-full mt-1 left-1/2 -translate-x-1/2 print-hide">
                       {tooltip}
                     </div>
                   </div>
@@ -915,4 +830,3 @@ const App = () => {
 };
 
 export default App;
-
