@@ -1,10 +1,9 @@
-# ...new file...
 name: Deploy to GitHub Pages
 
 on:
   push:
     branches:
-      - main  # o la rama que uses como principal
+      - main
 
 jobs:
   build-and-deploy:
@@ -33,4 +32,3 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
           publish_dir: ./dist
-# ...new file...
