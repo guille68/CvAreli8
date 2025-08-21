@@ -1,12 +1,15 @@
 {
   "name": "vite-react-typescript-starter",
+  "homepage": "https://guille68.github.io/CvAreli8/",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "html2canvas": "^1.4.1",
